@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maravilla Konto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap');
+
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root {
+    --navy: #0a0e1a;
+    --navy-mid: #111628;
+    --blue: #6B9BF7;
+    --blue-glow: rgba(107, 155, 247, 0.15);
+    --text-muted: rgba(255,255,255,0.35);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: #fff;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Atmospheric background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 45%, var(--blue-glow) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 35% at 55% 50%, rgba(107, 155, 247, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Subtle grid texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+    animation: containerIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes containerIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .logo-wrapper {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 40px;
+    position: relative;
+    animation: logoFloat 6s ease-in-out infinite;
+  }
+
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .logo-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, var(--blue-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(8px);
+  }
+
+  .logo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(107, 155, 247, 0.3));
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 16px;
+    animation: textIn 1s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes textIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    margin-bottom: 20px;
+    animation: textIn 1s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    animation: textIn 1s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-wrapper">
+      <img src="assets/logo.png" alt="Maravilla Konto" />
+    </div>
+    <h1>Maravilla Konto</h1>
+    <div class="divider"></div>
+    <p class="subtitle">Coming Soon</p>
+  </div>
+</body>
+</html>

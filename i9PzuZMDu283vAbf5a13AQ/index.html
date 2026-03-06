@@ -104,7 +104,18 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--blue);
+  }
+
+  .github-link {
     margin-left: auto;
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+
+  .github-link:hover {
+    color: var(--text);
   }
 
   .beta-badge::before {
@@ -295,6 +306,11 @@
   #release-notes h2:first-child,
   #release-notes h3:first-child { margin-top: 0; }
 
+  #release-notes p {
+    margin: 0 0 8px;
+    break-inside: avoid;
+  }
+
   #release-notes ul {
     list-style: none;
     padding: 0;
@@ -320,6 +336,17 @@
   }
 
   #release-notes strong { color: var(--text); font-weight: 500; }
+
+  #release-notes a {
+    color: var(--blue);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(107, 155, 247, 0.3);
+    transition: border-color 0.2s;
+  }
+
+  #release-notes a:hover {
+    border-color: var(--blue);
+  }
 
   #release-notes code {
     font-family: 'JetBrains Mono', monospace;
@@ -387,6 +414,9 @@
   <div class="topbar">
     <img class="logo" src="../assets/logo.png" alt="" />
     <span class="topbar-title">Maravilla Konto</span>
+    <a href="https://github.com/maravilla-labs/konto" target="_blank" rel="noopener noreferrer" class="github-link" title="View on GitHub">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+    </a>
     <span class="beta-badge">Beta Program</span>
   </div>
 
@@ -438,7 +468,7 @@
   </section>
 
   <footer>
-    <p>Maravilla Labs</p>
+    <p><a href="https://www.maravillalabs.com/" target="_blank" rel="noopener noreferrer" style="color:var(--text-dim);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.08);transition:color 0.2s">Maravilla Labs</a></p>
   </footer>
 
 </div>
@@ -519,16 +549,24 @@
     });
 
   function md(t) {
-    return t
+    var html = t
       .replace(/^### (.+)$/gm, '<h3>$1</h3>')
       .replace(/^## (.+)$/gm, '<h2>$1</h2>')
       .replace(/^# (.+)$/gm, '<h1>$1</h1>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/`(.+?)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
       .replace(/^- (.+)$/gm, '<li>$1</li>')
       .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
-      .replace(/<\/ul>\s*<ul>/g, '')
-      .replace(/\n\n/g, '<br><br>');
+      .replace(/<\/ul>\s*<ul>/g, '');
+    // Wrap loose text blocks in <p> tags to prevent column splitting
+    return html.split(/\n\n+/).map(function(block) {
+      block = block.trim();
+      if (!block) return '';
+      if (/^<(h[1-3]|ul|li|ol)/.test(block)) return block;
+      return '<p>' + block + '</p>';
+    }).join('\n');
   }
 })();
 </script>

@@ -56,6 +56,20 @@ cargo tauri dev
 
 The backend runs on `http://localhost:3000` and the frontend dev server on `http://localhost:5173`.
 
+## Download
+
+You can download pre-built desktop binaries from our [releases page](https://maravilla-labs.github.io/konto/i9PzuZMDu283vAbf5a13AQ/), or build from source using the instructions above.
+
+## Background
+
+Maravilla Konto started as one of several internal tools we built at [Maravilla Labs](https://www.maravillalabs.com/) over the past few years. We're sharing it as open source while we continue to finalize and migrate all functionality into it. Some features are still in progress — we appreciate your patience and feedback as we build in the open.
+
+## Community & Support
+
+- [Discord](https://discord.gg/bXTGfCY9) — chat with us, share feedback, or report bugs
+- [GitHub Issues](https://github.com/maravilla-labs/konto/issues) — report bugs or request features
+- [Maravilla Labs on GitHub](https://github.com/maravilla-labs) — check out our other projects
+
 ## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

@@ -49,10 +49,10 @@ jobs:
       matrix:
         include:
           - platform: macos-latest
-            args: '--target universal-apple-darwin --bundles dmg'
+            args: '--target universal-apple-darwin --bundles dmg,updater'
             rust_targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
           - platform: windows-latest
-            args: '--bundles nsis'
+            args: '--bundles nsis,updater'
             rust_targets: ''
 
     runs-on: ${{ matrix.platform }}
@@ -101,27 +101,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download release artifacts from GitHub Release
+      - name: Download latest.json from GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p artifacts
           TAG="${GITHUB_REF_NAME}"
-          # Download all assets from the release
-          gh release download "$TAG" --dir artifacts --repo ${{ github.repository }}
-          echo "Downloaded artifacts:"
-          ls -la artifacts/
+          gh release download "$TAG" --pattern 'latest.json' --repo ${{ github.repository }}
+          echo "Downloaded latest.json:"
+          cat latest.json
 
-      - name: Prepare release notes markdown
-        run: |
-          TAG="${GITHUB_REF_NAME}"
-          NOTES_FILE="release-notes/${TAG}.md"
-          mkdir -p deploy
-          if [ -f "$NOTES_FILE" ]; then
-            cp "$NOTES_FILE" deploy/notes.md
-          fi
-
-      - name: Deploy to gh-pages branch
+      - name: Deploy latest.json to gh-pages branch
         env:
           DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -132,42 +121,10 @@ jobs:
           git clone --branch gh-pages --single-branch \
             "https://x-access-token:${DEPLOY_TOKEN}@github.com/${{ github.repository }}.git" pages-repo
 
-          # Create releases directory
+          # Create releases directory and copy latest.json as-is
+          # (URLs already point to GitHub Release assets, which is correct for a public repo)
           mkdir -p "pages-repo/${BETA_PATH}/releases"
-
-          # Copy latest.json (updater manifest)
-          if [ -f artifacts/latest.json ]; then
-            cp artifacts/latest.json "pages-repo/${BETA_PATH}/releases/latest.json"
-          fi
-
-          # Copy release notes
-          if [ -f deploy/notes.md ]; then
-            cp deploy/notes.md "pages-repo/${BETA_PATH}/releases/notes.md"
-          fi
-
-          # Copy installer artifacts (DMG, EXE, sig files)
-          for f in artifacts/*.dmg artifacts/*.exe artifacts/*.nsis.zip artifacts/*.sig artifacts/*.tar.gz; do
-            [ -f "$f" ] && cp "$f" "pages-repo/${BETA_PATH}/releases/"
-          done
-
-          # Rewrite latest.json URLs to point to Pages
-          if [ -f "pages-repo/${BETA_PATH}/releases/latest.json" ]; then
-            PAGES_BASE="https://maravilla-labs.github.io/konto/${BETA_PATH}/releases"
-            cd "pages-repo/${BETA_PATH}/releases"
-            # Replace GitHub release URLs with Pages URLs
-            python3 -c "
-          import json, os, re
-          with open('latest.json', 'r') as f:
-              data = json.load(f)
-          for platform in data.get('platforms', {}).values():
-              url = platform.get('url', '')
-              filename = url.rsplit('/', 1)[-1] if '/' in url else url
-              platform['url'] = '${PAGES_BASE}/' + filename
-          with open('latest.json', 'w') as f:
-              json.dump(data, f, indent=2)
-          "
-            cd -
-          fi
+          cp latest.json "pages-repo/${BETA_PATH}/releases/latest.json"
 
           # Commit and push
           cd pages-repo

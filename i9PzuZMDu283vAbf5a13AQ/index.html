@@ -445,33 +445,71 @@
 
 <script>
 (function() {
-  var BASE = location.href.replace(/\/[^/]*$/, '/');
-  var RELEASES_DIR = BASE + 'releases/';
+  var REPO = 'maravilla-labs/konto';
+  var API_URL = 'https://api.github.com/repos/' + REPO + '/releases';
+  var CACHE_KEY = 'konto_releases';
+  var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  fetch(RELEASES_DIR + 'latest.json')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
-    .then(function(data) {
-      var version = data.version;
-      document.getElementById('version-tag').textContent = 'v' + version;
+  function getCached() {
+    try {
+      var raw = sessionStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var cached = JSON.parse(raw);
+      if (Date.now() - cached.ts > CACHE_TTL) return null;
+      return cached.data;
+    } catch (e) { return null; }
+  }
 
-      var mac = data.platforms?.['darwin-universal'] || data.platforms?.['darwin-aarch64'] || data.platforms?.['darwin-x86_64'];
-      if (mac?.url) {
+  function setCache(data) {
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) { /* ignore */ }
+  }
+
+  function loadRelease() {
+    var cached = getCached();
+    if (cached) return Promise.resolve(cached);
+
+    return fetch(API_URL)
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function(releases) {
+        if (!releases.length) return Promise.reject();
+        var release = releases[0];
+        setCache(release);
+        return release;
+      });
+  }
+
+  function findAsset(assets, ext) {
+    for (var i = 0; i < assets.length; i++) {
+      if (assets[i].name.endsWith(ext)) return assets[i];
+    }
+    return null;
+  }
+
+  loadRelease()
+    .then(function(release) {
+      document.getElementById('version-tag').textContent = release.tag_name;
+
+      var dmg = findAsset(release.assets, '.dmg');
+      if (dmg) {
         var macBtn = document.getElementById('download-mac');
-        macBtn.href = mac.url;
+        macBtn.href = dmg.browser_download_url;
         macBtn.classList.remove('disabled');
       }
 
-      var win = data.platforms?.['windows-x86_64'];
-      if (win?.url) {
+      var exe = findAsset(release.assets, '.exe');
+      if (exe) {
         var winBtn = document.getElementById('download-win');
-        winBtn.href = win.url;
+        winBtn.href = exe.browser_download_url;
         winBtn.classList.remove('disabled');
       }
 
-      if (data.notes) {
-        document.getElementById('release-notes').innerHTML = md(data.notes);
+      if (release.body) {
+        document.getElementById('release-notes').innerHTML = md(release.body);
       } else {
-        loadNotes();
+        document.getElementById('release-notes').innerHTML =
+          '<p style="color:var(--text-dim)">No release notes available.</p>';
       }
     })
     .catch(function() {
@@ -479,16 +517,6 @@
         '<p style="color:var(--text-dim)">No releases available yet. Check back soon.</p>';
       document.getElementById('version-tag').textContent = '';
     });
-
-  function loadNotes() {
-    fetch(RELEASES_DIR + 'notes.md')
-      .then(function(r) { return r.ok ? r.text() : Promise.reject(); })
-      .then(function(t) { document.getElementById('release-notes').innerHTML = md(t); })
-      .catch(function() {
-        document.getElementById('release-notes').innerHTML =
-          '<p style="color:var(--text-dim)">Release notes will appear here when the first beta build is published.</p>';
-      });
-  }
 
   function md(t) {
     return t

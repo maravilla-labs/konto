@@ -127,7 +127,7 @@ export function EmployeesPage() {
           setCreateForm({ ...emptyForm });
           setCreateUser(false);
           setUserRoleId('');
-          const data = res.data as CreateEmployeeResponse;
+          const data = res.data as unknown as CreateEmployeeResponse;
           if (data.provisioned_user) {
             setTempPasswordInfo({
               userId: data.provisioned_user.user_id,
@@ -317,7 +317,7 @@ export function EmployeesPage() {
       {/* Temp Password Dialog */}
       <TempPasswordDialog
         open={!!tempPasswordInfo}
-        onClose={() => setTempPasswordInfo(null)}
+        onConfirm={() => setTempPasswordInfo(null)}
         password={tempPasswordInfo?.password ?? ''}
       />
     </div>

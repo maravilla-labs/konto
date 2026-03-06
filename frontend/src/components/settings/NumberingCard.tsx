@@ -11,8 +11,9 @@ interface NumberingCardProps {
   startField: string;
   minLengthField: string;
   yearlyField: string;
-  form: Record<string, string | number | boolean | null>;
-  setForm: (form: Record<string, string | number | boolean | null>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: any;
+  setForm: (form: any) => void;
 }
 
 export function NumberingCard({
@@ -42,7 +43,7 @@ export function NumberingCard({
             </p>
           </div>
           <Switch
-            checked={isAuto}
+            checked={!!isAuto}
             onCheckedChange={(checked) => setForm({ ...form, [autoField]: checked })}
           />
         </div>
@@ -52,7 +53,7 @@ export function NumberingCard({
               <div>
                 <Label>{t('settings.numbering_prefix', 'Prefix')}</Label>
                 <Input
-                  value={form[prefixField] ?? ''}
+                  value={String(form[prefixField] ?? '')}
                   onChange={(e) => setForm({ ...form, [prefixField]: e.target.value })}
                 />
               </div>
@@ -60,7 +61,7 @@ export function NumberingCard({
                 <Label>{t('settings.numbering_start', 'Start Number')}</Label>
                 <Input
                   type="number"
-                  value={form[startField] ?? 1}
+                  value={Number(form[startField] ?? 1)}
                   onChange={(e) => setForm({ ...form, [startField]: parseInt(e.target.value) || 1 })}
                 />
               </div>
@@ -70,7 +71,7 @@ export function NumberingCard({
                 <Label>{t('settings.numbering_min_length', 'Minimum Length')}</Label>
                 <Input
                   type="number"
-                  value={form[minLengthField] ?? 3}
+                  value={Number(form[minLengthField] ?? 3)}
                   onChange={(e) => setForm({ ...form, [minLengthField]: parseInt(e.target.value) || 3 })}
                   min={1}
                   max={10}
@@ -78,7 +79,7 @@ export function NumberingCard({
               </div>
               <div className="flex items-center gap-3 pt-5">
                 <Switch
-                  checked={form[yearlyField] ?? false}
+                  checked={!!form[yearlyField]}
                   onCheckedChange={(checked) => setForm({ ...form, [yearlyField]: checked })}
                 />
                 <Label>{t('settings.numbering_restart_yearly', 'Restart numbering yearly')}</Label>

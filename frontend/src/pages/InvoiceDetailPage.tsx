@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { MarkdownPreview } from '@/components/ui/markdown-preview';
@@ -459,7 +458,7 @@ export function InvoiceDetailPage() {
         open={pdfOpen}
         onOpenChange={setPdfOpen}
         invoiceId={id!}
-        invoiceNumber={data.invoice_number}
+        invoiceNumber={data.invoice_number ?? undefined}
       />
       <ReminderDialog
         open={reminderOpen} onOpenChange={setReminderOpen}

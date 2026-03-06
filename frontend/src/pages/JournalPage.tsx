@@ -1,5 +1,4 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import {
   useJournalEntries,
   usePostJournal,

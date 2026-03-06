@@ -38,7 +38,7 @@ export function RichTextEditor({
     ],
     content: value || '',
     onUpdate: ({ editor }) => {
-      const md = editor.storage.markdown.getMarkdown() as string;
+      const md = (editor.storage as Record<string, any>).markdown.getMarkdown() as string;
       onChangeRef.current(md);
     },
     onFocus: () => setFocused(true),
@@ -49,7 +49,7 @@ export function RichTextEditor({
   const lastValue = useRef(value);
   useEffect(() => {
     if (editor && value !== lastValue.current) {
-      const currentMd = editor.storage.markdown.getMarkdown() as string;
+      const currentMd = (editor.storage as Record<string, any>).markdown.getMarkdown() as string;
       if (value !== currentMd) {
         editor.commands.setContent(value || '');
       }

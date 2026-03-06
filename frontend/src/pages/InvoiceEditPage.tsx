@@ -35,7 +35,7 @@ export function InvoiceEditPage() {
     default_vat_rate_id: '',
     default_account_id: '',
     bank_account_id: '',
-    lines: [{ description: '', quantity: '1', unit_price: '', vat_rate_id: '', account_id: '', discount_percent: '' }],
+    lines: [{ _key: crypto.randomUUID(), description: '', quantity: '1', unit_price: '', vat_rate_id: '', account_id: '', discount_percent: '' }],
   });
 
   useEffect(() => {
@@ -61,6 +61,7 @@ export function InvoiceEditPage() {
         default_vat_rate_id: allSameVat ? lineVatIds[0]! : '',
         default_account_id: allSameAccount ? lineAccountIds[0]! : '',
         lines: data.lines.map((l): LineFormData => ({
+          _key: crypto.randomUUID(),
           description: l.description,
           quantity: l.quantity,
           unit_price: l.unit_price,

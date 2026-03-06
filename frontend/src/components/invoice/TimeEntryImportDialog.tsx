@@ -85,6 +85,7 @@ export function TimeEntryImportDialog({
         const hours = e.actual_minutes / 60;
         const rate = resolveRate(e.activity_type_id);
         return {
+          _key: crypto.randomUUID(),
           description: e.description || `${e.date} — ${e.actual_minutes} min`,
           quantity: hours.toFixed(2),
           unit_price: rate.toString(),

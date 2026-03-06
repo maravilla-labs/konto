@@ -41,6 +41,7 @@ export interface CompanySettings {
 }
 
 export interface UpdateCompanySettings {
+  [key: string]: string | number | boolean | null | undefined;
   legal_name: string;
   trade_name?: string | null;
   street: string;

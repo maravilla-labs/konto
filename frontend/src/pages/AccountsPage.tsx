@@ -163,8 +163,8 @@ export function AccountsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [allExpanded, setAllExpanded] = useState(true);
-  const [expandKey, setExpandKey] = useState(0);
+  const [allExpanded, _setAllExpanded] = useState(true);
+  const [expandKey, _setExpandKey] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [createForm, setCreateForm] = useState({ number: '', name: '', description: '' });
   const [editForm, setEditForm] = useState({ id: '', name: '', description: '', is_active: true });

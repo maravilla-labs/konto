@@ -86,7 +86,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: src-tauri
-          tauriScript: npx tauri
+          tauriScript: npx --prefix frontend tauri
           args: ${{ matrix.args }}
           tagName: ${{ github.ref_name }}
           releaseName: 'Maravilla Konto ${{ github.ref_name }}'

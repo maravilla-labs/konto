@@ -69,7 +69,6 @@ impl SetupService {
     /// Returns JWT tokens for auto-login. Returns 409 if users already exist.
     /// The user creation relies on the email UNIQUE constraint as a final guard
     /// against race conditions.
-    #[allow(clippy::unwrap_used)]
     pub async fn complete_setup(
         db: &DatabaseConnection,
         jwt: &JwtService,
@@ -230,14 +229,17 @@ impl SetupService {
         // 3. Create initial fiscal year
         let current_year = Utc::now().year();
         let fy_start_date = NaiveDate::from_ymd_opt(current_year, fy_start as u32, 1)
-            .unwrap_or_else(|| NaiveDate::from_ymd_opt(current_year, 1, 1).unwrap());
+            .or_else(|| NaiveDate::from_ymd_opt(current_year, 1, 1))
+            .ok_or_else(|| AppError::Internal("Invalid fiscal year start date".to_string()))?;
         let fy_end_date = if fy_start == 1 {
-            NaiveDate::from_ymd_opt(current_year, 12, 31).unwrap()
+            NaiveDate::from_ymd_opt(current_year, 12, 31)
+                .ok_or_else(|| AppError::Internal("Invalid fiscal year end date".to_string()))?
         } else {
             let end_year = current_year + 1;
             let end_month = if fy_start == 1 { 12 } else { fy_start as u32 - 1 };
-            let last_day = last_day_of_month(end_year, end_month);
-            NaiveDate::from_ymd_opt(end_year, end_month, last_day).unwrap()
+            let last_day = last_day_of_month(end_year, end_month)?;
+            NaiveDate::from_ymd_opt(end_year, end_month, last_day)
+                .ok_or_else(|| AppError::Internal("Invalid fiscal year end date".to_string()))?
         };
 
         // Only create if no fiscal year exists yet
@@ -274,9 +276,11 @@ impl SetupService {
                 } else {
                     fy_start_date.year() + 1
                 };
-                let p_start = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
-                let p_end_day = last_day_of_month(year, month);
-                let p_end = NaiveDate::from_ymd_opt(year, month, p_end_day).unwrap();
+                let p_start = NaiveDate::from_ymd_opt(year, month, 1)
+                    .ok_or_else(|| AppError::Internal(format!("Invalid period start: {year}-{month}")))?;
+                let p_end_day = last_day_of_month(year, month)?;
+                let p_end = NaiveDate::from_ymd_opt(year, month, p_end_day)
+                    .ok_or_else(|| AppError::Internal(format!("Invalid period end: {year}-{month}-{p_end_day}")))?;
 
                 let period = fiscal_period::ActiveModel {
                     id: Set(Uuid::new_v4().to_string()),
@@ -310,15 +314,14 @@ impl SetupService {
     }
 }
 
-#[allow(clippy::unwrap_used)]
-fn last_day_of_month(year: i32, month: u32) -> u32 {
+fn last_day_of_month(year: i32, month: u32) -> Result<u32, AppError> {
     let next = if month == 12 {
         NaiveDate::from_ymd_opt(year + 1, 1, 1)
     } else {
         NaiveDate::from_ymd_opt(year, month + 1, 1)
     };
-    next.unwrap()
+    next.ok_or_else(|| AppError::Internal(format!("Invalid date: {year}-{month}")))?
         .pred_opt()
-        .unwrap()
-        .day()
+        .ok_or_else(|| AppError::Internal(format!("No previous day for {year}-{month}")))
+        .map(|d| d.day())
 }

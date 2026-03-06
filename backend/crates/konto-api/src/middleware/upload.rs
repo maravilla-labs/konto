@@ -70,5 +70,25 @@ fn validate_upload(
         ));
     }
 
+    validate_magic_bytes(mime_type, data)?;
+
+    Ok(())
+}
+
+fn validate_magic_bytes(mime_type: &str, data: &[u8]) -> Result<(), AppError> {
+    let valid = match mime_type {
+        "image/png" => data.starts_with(b"\x89PNG\r\n\x1a\n"),
+        "image/jpeg" => data.starts_with(b"\xFF\xD8\xFF"),
+        "image/webp" => data.len() >= 12 && &data[..4] == b"RIFF" && &data[8..12] == b"WEBP",
+        "image/gif" => data.starts_with(b"GIF87a") || data.starts_with(b"GIF89a"),
+        "application/pdf" => data.starts_with(b"%PDF"),
+        // text/*, xlsx: no reliable magic check
+        _ => return Ok(()),
+    };
+    if !valid {
+        return Err(AppError::Validation(
+            "File content does not match declared type".to_string(),
+        ));
+    }
     Ok(())
 }

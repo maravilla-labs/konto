@@ -24,8 +24,11 @@ impl RateLimiter {
         let mut map = self.requests.lock().await;
         let now = Instant::now();
 
+        map.retain(|_, timestamps| {
+            timestamps.retain(|t| now.duration_since(*t) < self.window);
+            !timestamps.is_empty()
+        });
         let timestamps = map.entry(key.to_string()).or_default();
-        timestamps.retain(|t| now.duration_since(*t) < self.window);
 
         if timestamps.len() >= self.max_requests {
             return Err(AppError::BadRequest(

@@ -6,6 +6,12 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Bare client for refresh requests — no interceptors to avoid deadlock
+const refreshClient = axios.create({
+  baseURL: '/api/v1',
+  headers: { 'Content-Type': 'application/json' },
+});
+
 // Initialize dynamic base URL for Tauri mode
 let baseUrlInitialized = false;
 
@@ -14,6 +20,7 @@ async function ensureBaseUrl() {
     baseUrlInitialized = true;
     const baseURL = await getApiBaseUrl();
     client.defaults.baseURL = baseURL;
+    refreshClient.defaults.baseURL = baseURL;
   }
 }
 
@@ -43,8 +50,12 @@ client.interceptors.request.use(async (config) => {
 
   const tokens = localStorage.getItem('konto_tokens');
   if (tokens) {
-    const { access_token } = JSON.parse(tokens);
-    config.headers.Authorization = `Bearer ${access_token}`;
+    try {
+      const { access_token } = JSON.parse(tokens);
+      config.headers.Authorization = `Bearer ${access_token}`;
+    } catch {
+      localStorage.removeItem('konto_tokens');
+    }
   }
   return config;
 });
@@ -74,9 +85,14 @@ client.interceptors.response.use(
       const tokens = localStorage.getItem('konto_tokens');
       if (!tokens) throw new Error('No tokens');
 
-      const { refresh_token } = JSON.parse(tokens);
-      // Use the client instance (which has the correct baseURL) for refresh
-      const { data } = await client.post('/auth/refresh', { refresh_token });
+      let refresh_token: string;
+      try {
+        ({ refresh_token } = JSON.parse(tokens));
+      } catch {
+        localStorage.removeItem('konto_tokens');
+        throw new Error('Corrupted tokens');
+      }
+      const { data } = await refreshClient.post('/auth/refresh', { refresh_token });
 
       localStorage.setItem(
         'konto_tokens',

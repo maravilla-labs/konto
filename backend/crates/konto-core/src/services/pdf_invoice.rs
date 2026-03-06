@@ -208,7 +208,7 @@ fn build_typst_source(data: &PdfData) -> Result<String, AppError> {
 
     // QR-bill page (page 2)
     let qr_section = if data.bank.is_some() {
-        build_qr_bill_section(data, &labels)
+        build_qr_bill_section(data, &labels)?
     } else {
         String::new()
     };
@@ -417,9 +417,9 @@ fn build_typst_source(data: &PdfData) -> Result<String, AppError> {
     ))
 }
 
-#[allow(clippy::unwrap_used)]
-fn build_qr_bill_section(data: &PdfData, labels: &InvoiceLabels) -> String {
-    let bank = data.bank.as_ref().unwrap();
+fn build_qr_bill_section(data: &PdfData, labels: &InvoiceLabels) -> Result<String, AppError> {
+    let bank = data.bank.as_ref()
+        .ok_or_else(|| AppError::Internal("Bank account required for QR-bill".to_string()))?;
     let inv = &data.invoice;
     let s = &data.settings;
     let c = &data.contact;
@@ -442,7 +442,7 @@ fn build_qr_bill_section(data: &PdfData, labels: &InvoiceLabels) -> String {
     // §3.4: Only Helvetica, Arial, Frutiger, Liberation Sans
     // §3.7: PDF format — lines (not perforation) with scissors on BOTH horizontal AND vertical
     // #place(bottom) ensures the 105mm box is flush with page bottom (no spacing overflow)
-    format!(r##"
+    Ok(format!(r##"
 // === QR-bill page — SIX IG QR-bill v2.3 ===
 #set page(paper: "a4", margin: 0mm)
 #set text(font: ("Helvetica", "Arial", "Frutiger", "Liberation Sans"))
@@ -582,7 +582,7 @@ fn build_qr_bill_section(data: &PdfData, labels: &InvoiceLabels) -> String {
         debtor_postal_city = esc(&debtor_postal_city),
         currency = &data.currency,
         total = total,
-    )
+    ))
 }
 
 #[derive(Clone, Copy)]

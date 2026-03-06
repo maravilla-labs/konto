@@ -43,6 +43,7 @@ export interface NavItem {
   roles: Role[];           // empty = all roles
   showInSidebar: boolean;  // false for settings sub-pages
   parent?: string;         // for sub-items
+  experimental?: boolean;  // hidden unless experimental mode is on
 }
 
 export interface QuickAction {
@@ -52,6 +53,7 @@ export interface QuickAction {
   icon: LucideIcon;
   keywords: string[];
   roles: Role[];
+  experimental?: boolean;
 }
 
 export const navItems: NavItem[] = [
@@ -62,7 +64,7 @@ export const navItems: NavItem[] = [
   { id: 'invoices', label: 'Invoices', category: 'Sales', path: '/invoices', icon: ReceiptText, keywords: ['rechnung', 'rechnungen', 'bills', 'faktura'], roles: [], showInSidebar: true },
   { id: 'recurring-invoices', label: 'Recurring Invoices', category: 'Sales', path: '/invoices/recurring', icon: RefreshCw, keywords: ['wiederkehrend', 'abo', 'subscription', 'recurring'], roles: [], showInSidebar: true, parent: 'invoices' },
   { id: 'credit-notes', label: 'Credit Notes', category: 'Sales', path: '/credit-notes', icon: Receipt, keywords: ['gutschrift', 'gutschriften', 'credit'], roles: [], showInSidebar: true },
-  { id: 'documents', label: 'Quotes & Documents', category: 'Sales', path: '/documents', icon: FileStack, keywords: ['angebot', 'offerte', 'dokument', 'vertrag', 'quote', 'offer', 'contract', 'sow'], roles: [], showInSidebar: true },
+  { id: 'documents', label: 'Quotes & Documents', category: 'Sales', path: '/documents', icon: FileStack, keywords: ['angebot', 'offerte', 'dokument', 'vertrag', 'quote', 'offer', 'contract', 'sow'], roles: [], showInSidebar: true, experimental: true },
 
   // Finance
   { id: 'accounts', label: 'Chart of Accounts', category: 'Finance', path: '/accounts', icon: BookOpen, keywords: ['kontenplan', 'konto', 'konten', 'chart'], roles: [], showInSidebar: true },
@@ -123,5 +125,5 @@ export const quickActions: QuickAction[] = [
   { id: 'new-journal', label: 'New Journal Entry', path: '/journal/new', icon: Plus, keywords: ['neue buchung', 'buchung erstellen'], roles: [] },
   { id: 'new-expense', label: 'New Expense', path: '/expenses/new', icon: Plus, keywords: ['neue ausgabe', 'ausgabe erstellen'], roles: [] },
   { id: 'new-credit-note', label: 'New Credit Note', path: '/credit-notes/new', icon: Plus, keywords: ['neue gutschrift'], roles: [] },
-  { id: 'new-document', label: 'New Document', path: '/documents/new', icon: Plus, keywords: ['neues dokument', 'neues angebot'], roles: [] },
+  { id: 'new-document', label: 'New Document', path: '/documents/new', icon: Plus, keywords: ['neues dokument', 'neues angebot'], roles: [], experimental: true },
 ];

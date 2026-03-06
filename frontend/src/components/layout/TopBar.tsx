@@ -1,13 +1,19 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Check, ChevronDown, MessageCircle, Search } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { isTauri } from '@/lib/platform';
 import { WinControls, useIsMac } from './WindowControls';
 import { useNavigation } from '@/hooks/useNavigation';
 import type { NavCategory, NavItem } from '@/lib/navigation';
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/lib/language';
+import { DISCORD_URL } from '@/lib/constants';
 import { useI18n } from '@/i18n';
 import {
   DropdownMenu,
@@ -264,6 +270,33 @@ export function TopBar() {
         )}
       </div>
       <div className="flex-1" />
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            className="relative z-10 flex items-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-500/20 transition-colors dark:text-amber-400 dark:border-amber-400/30 dark:bg-amber-400/10 dark:hover:bg-amber-400/20"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('ui.feedback_title', 'Feedback')}</span>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="bottom" align="end" className="w-72 p-4 space-y-2">
+          <p className="font-semibold text-sm">
+            {t('ui.feedback_title', 'Feedback & Support')}
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {t('ui.feedback_description', 'Got ideas, found a bug, or need help? Join our Discord community — we\'d love to hear from you.')}
+          </p>
+          <a
+            href={DISCORD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5865F2] hover:underline"
+          >
+            {t('ui.feedback_discord', 'Open Discord')}
+            <span aria-hidden>&rarr;</span>
+          </a>
+        </PopoverContent>
+      </Popover>
       <select
         value={language}
         onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}

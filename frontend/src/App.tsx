@@ -80,6 +80,7 @@ import { PayoutSchedulePage } from '@/pages/PayoutSchedulePage';
 import { SalaryCertificatesPage } from '@/pages/SalaryCertificatesPage';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { useFeatureFlagStore } from '@/stores/featureFlagStore';
 import { useFullscreenSync } from '@/components/layout/WindowControls';
 import { SetupPage } from '@/pages/SetupPage';
 import { PdfViewPage } from '@/pages/PdfViewPage';
@@ -96,11 +97,18 @@ const queryClient = new QueryClient({
   },
 });
 
+function ExperimentalGuard({ children }: { children: React.ReactNode }) {
+  const experimental = useFeatureFlagStore((s) => s.experimental);
+  if (!experimental) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   const initialize = useAuthStore((s) => s.initialize);
 
   useEffect(() => {
     initialize();
+    useFeatureFlagStore.getState().initialize();
   }, [initialize]);
 
   // Sync fullscreen class on <html> for Tauri desktop
@@ -147,10 +155,10 @@ function AppRoutes() {
           <Route path="/expenses/new" element={<ExpenseCreatePage />} />
           <Route path="/expenses/:id" element={<ExpenseDetailPage />} />
           <Route path="/expenses/:id/edit" element={<ExpenseEditPage />} />
-          <Route path="/documents" element={<DocumentsPage />} />
-          <Route path="/documents/new" element={<DocumentCreatePage />} />
-          <Route path="/documents/:id" element={<DocumentDetailPage />} />
-          <Route path="/documents/:id/edit" element={<DocumentEditPage />} />
+          <Route path="/documents" element={<ExperimentalGuard><DocumentsPage /></ExperimentalGuard>} />
+          <Route path="/documents/new" element={<ExperimentalGuard><DocumentCreatePage /></ExperimentalGuard>} />
+          <Route path="/documents/:id" element={<ExperimentalGuard><DocumentDetailPage /></ExperimentalGuard>} />
+          <Route path="/documents/:id/edit" element={<ExperimentalGuard><DocumentEditPage /></ExperimentalGuard>} />
           <Route path="/banking" element={<BankingPage />} />
           <Route path="/banking/reconcile" element={<ReconciliationPage />} />
           <Route path="/import" element={<RoleGuard roles={['admin']}><ImportPage /></RoleGuard>} />

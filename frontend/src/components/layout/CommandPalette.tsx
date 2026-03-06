@@ -12,6 +12,7 @@ import {
 import { quickActions } from '@/lib/navigation';
 import { useRecentPages } from '@/hooks/useRecentPages';
 import { useNavigation } from '@/hooks/useNavigation';
+import { useFeatureFlagStore } from '@/stores/featureFlagStore';
 import { useI18n } from '@/i18n';
 
 export function CommandPalette() {
@@ -19,6 +20,7 @@ export function CommandPalette() {
   const navigate = useNavigate();
   const { recentItems } = useRecentPages();
   const { filteredItems } = useNavigation();
+  const experimental = useFeatureFlagStore((s) => s.experimental);
   const { t } = useI18n();
 
   useEffect(() => {
@@ -40,8 +42,9 @@ export function CommandPalette() {
     [navigate],
   );
 
-  // Filter quick actions by role
+  // Filter quick actions by role and feature flags
   const filteredActions = quickActions.filter((action) => {
+    if (action.experimental && !experimental) return false;
     if (action.roles.length === 0) return true;
     return filteredItems.some((item) => item.path === action.path);
   });

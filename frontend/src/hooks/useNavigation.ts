@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { navItems, type NavItem, type NavCategory } from '@/lib/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import { useFeatureFlagStore } from '@/stores/featureFlagStore';
 import type { Role } from '@/types/auth';
 import { useI18n } from '@/i18n';
 
@@ -12,11 +13,13 @@ export interface NavGroup {
 export function useNavigation() {
   const user = useAuthStore((s) => s.user);
   const userRole = (user?.role ?? 'employee') as Role;
+  const experimental = useFeatureFlagStore((s) => s.experimental);
   const { t } = useI18n();
 
   const filteredItems = useMemo(() => {
     return navItems
       .filter((item) => {
+        if (item.experimental && !experimental) return false;
         if (item.roles.length === 0) return true;
         return item.roles.includes(userRole);
       })
@@ -24,7 +27,7 @@ export function useNavigation() {
         ...item,
         label: t(`nav.${item.id}`, item.label),
       }));
-  }, [t, userRole]);
+  }, [t, userRole, experimental]);
 
   const sidebarItems = useMemo(() => {
     return filteredItems.filter((item) => item.showInSidebar);

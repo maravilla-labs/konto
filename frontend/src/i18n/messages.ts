@@ -1149,6 +1149,20 @@ export const MESSAGES: Record<SupportedLanguage, Record<string, string>> = {
     'contact_picker.persons': 'Persons',
     'contact_picker.select_contact': 'Select contact',
     'contact_picker.select_person': 'Select contact person',
+
+    'profile.experimental_title': 'Experimental Features',
+    'profile.experimental_description': 'Enable features that are still in development. These may be incomplete or unstable.',
+    'profile.experimental_label': 'Enable experimental features',
+
+    'ui.feedback_title': 'Feedback & Support',
+    'ui.feedback_description': 'Got ideas, found a bug, or need help? Join our Discord community — we\'d love to hear from you.',
+    'ui.feedback_discord': 'Open Discord',
+    'setup.discord_title': 'Join our community',
+    'setup.discord_description': 'Got ideas, found a bug, or just want to say hi? Join us on Discord — we\'d love to hear from you.',
+    'setup.discord_join': 'Join Discord',
+    'dashboard.discord_title': 'Welcome to the beta!',
+    'dashboard.discord_description': 'This is an early version of Maravilla Konto. We\'d love your feedback — report bugs, request features, or just come hang out on our Discord.',
+    'dashboard.discord_join': 'Join our Discord',
   },
   de: {
     'category.overview': 'Uebersicht',
@@ -2297,6 +2311,20 @@ export const MESSAGES: Record<SupportedLanguage, Record<string, string>> = {
     'contact_picker.persons': 'Personen',
     'contact_picker.select_contact': 'Kontakt waehlen',
     'contact_picker.select_person': 'Kontaktperson waehlen',
+
+    'profile.experimental_title': 'Experimentelle Funktionen',
+    'profile.experimental_description': 'Aktiviere Funktionen, die sich noch in Entwicklung befinden. Diese koennen unvollstaendig oder instabil sein.',
+    'profile.experimental_label': 'Experimentelle Funktionen aktivieren',
+
+    'ui.feedback_title': 'Feedback & Support',
+    'ui.feedback_description': 'Hast du Ideen, einen Fehler gefunden oder brauchst Hilfe? Tritt unserer Discord-Community bei — wir freuen uns auf dich.',
+    'ui.feedback_discord': 'Discord oeffnen',
+    'setup.discord_title': 'Tritt unserer Community bei',
+    'setup.discord_description': 'Hast du Ideen, einen Fehler gefunden oder moechtest einfach Hallo sagen? Komm auf unseren Discord — wir freuen uns auf dich.',
+    'setup.discord_join': 'Discord beitreten',
+    'dashboard.discord_title': 'Willkommen in der Beta!',
+    'dashboard.discord_description': 'Dies ist eine fruehe Version von Maravilla Konto. Wir freuen uns ueber dein Feedback — melde Fehler, wuensche dir Features oder komm einfach auf unserem Discord vorbei.',
+    'dashboard.discord_join': 'Unserem Discord beitreten',
   },
   fr: {
     'category.overview': 'Apercu',
@@ -3445,6 +3473,20 @@ export const MESSAGES: Record<SupportedLanguage, Record<string, string>> = {
     'contact_picker.persons': 'Personnes',
     'contact_picker.select_contact': 'Selectionner un contact',
     'contact_picker.select_person': 'Selectionner une personne de contact',
+
+    'profile.experimental_title': 'Fonctionnalites experimentales',
+    'profile.experimental_description': 'Activer les fonctionnalites encore en developpement. Elles peuvent etre incompletes ou instables.',
+    'profile.experimental_label': 'Activer les fonctionnalites experimentales',
+
+    'ui.feedback_title': 'Feedback & Support',
+    'ui.feedback_description': 'Une idee, un bug, ou besoin d\'aide ? Rejoignez notre communaute Discord — on sera ravis de vous accueillir.',
+    'ui.feedback_discord': 'Ouvrir Discord',
+    'setup.discord_title': 'Rejoignez notre communaute',
+    'setup.discord_description': 'Une idee, un bug, ou juste envie de dire bonjour ? Rejoignez-nous sur Discord — on sera ravis de vous accueillir.',
+    'setup.discord_join': 'Rejoindre Discord',
+    'dashboard.discord_title': 'Bienvenue dans la beta !',
+    'dashboard.discord_description': 'Ceci est une version anticipee de Maravilla Konto. Partagez vos retours — signalez des bugs, suggerez des fonctionnalites ou passez simplement nous voir sur Discord.',
+    'dashboard.discord_join': 'Rejoindre notre Discord',
   },
   it: {
     'category.overview': 'Panoramica',
@@ -4593,5 +4635,19 @@ export const MESSAGES: Record<SupportedLanguage, Record<string, string>> = {
     'contact_picker.persons': 'Persone',
     'contact_picker.select_contact': 'Seleziona contatto',
     'contact_picker.select_person': 'Seleziona persona di contatto',
+
+    'profile.experimental_title': 'Funzionalita sperimentali',
+    'profile.experimental_description': 'Attiva le funzionalita ancora in fase di sviluppo. Potrebbero essere incomplete o instabili.',
+    'profile.experimental_label': 'Attiva funzionalita sperimentali',
+
+    'ui.feedback_title': 'Feedback & Support',
+    'ui.feedback_description': 'Hai idee, hai trovato un bug o hai bisogno di aiuto? Unisciti alla nostra community Discord — ci farebbe piacere sentirti.',
+    'ui.feedback_discord': 'Apri Discord',
+    'setup.discord_title': 'Unisciti alla nostra community',
+    'setup.discord_description': 'Hai idee, hai trovato un bug o vuoi semplicemente salutarci? Unisciti a noi su Discord — ci farebbe piacere sentirti.',
+    'setup.discord_join': 'Unisciti a Discord',
+    'dashboard.discord_title': 'Benvenuto nella beta!',
+    'dashboard.discord_description': 'Questa e una versione iniziale di Maravilla Konto. Ci piacerebbe ricevere il tuo feedback — segnala bug, richiedi funzionalita o vieni a trovarci sul nostro Discord.',
+    'dashboard.discord_join': 'Unisciti al nostro Discord',
   },
 };

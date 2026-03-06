@@ -2159,7 +2159,7 @@ dependencies = [
 
 [[package]]
 name = "konto-api"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "axum",
  "axum-extra",
@@ -2182,7 +2182,7 @@ dependencies = [
 
 [[package]]
 name = "konto-common"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "axum",
  "chrono",
@@ -2197,7 +2197,7 @@ dependencies = [
 
 [[package]]
 name = "konto-core"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "anyhow",
  "argon2",
@@ -2231,7 +2231,7 @@ dependencies = [
 
 [[package]]
 name = "konto-db"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "chrono",
  "konto-common",
@@ -2244,7 +2244,7 @@ dependencies = [
 
 [[package]]
 name = "konto-migration"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "argon2",
  "chrono",
@@ -2255,7 +2255,7 @@ dependencies = [
 
 [[package]]
 name = "konto-server"
-version = "0.1.0"
+version = "0.1.0-beta.1"
 dependencies = [
  "axum",
  "dotenvy",

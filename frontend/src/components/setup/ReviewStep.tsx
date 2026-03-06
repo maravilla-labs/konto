@@ -1,7 +1,8 @@
 import { useI18n } from '@/i18n';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, Check } from 'lucide-react';
+import { Loader2, Pencil, Check, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DISCORD_URL } from '@/lib/constants';
 
 interface ReviewData {
   language: string;
@@ -177,6 +178,34 @@ export function ReviewStep({ data, onGoToStep, onComplete, isSubmitting, error }
           {error}
         </motion.div>
       )}
+
+      <motion.div
+        className="rounded-xl border border-[#5865F2]/20 bg-[#5865F2]/5 p-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.3 }}
+      >
+        <div className="flex items-start gap-3">
+          <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5865F2]" />
+          <div className="space-y-1 text-sm">
+            <p className="font-medium text-[#1B2B4B]">
+              {t('setup.discord_title', 'Join our community')}
+            </p>
+            <p className="text-[#1B2B4B]/50 font-light leading-relaxed">
+              {t('setup.discord_description', 'Got ideas, found a bug, or just want to say hi? Join us on Discord — we\'d love to hear from you.')}
+            </p>
+            <a
+              href={DISCORD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-1 text-[#5865F2] font-medium hover:underline"
+            >
+              {t('setup.discord_join', 'Join Discord')}
+              <span aria-hidden>&rarr;</span>
+            </a>
+          </div>
+        </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}

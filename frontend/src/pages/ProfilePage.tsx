@@ -10,8 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
+import { useFeatureFlagStore } from '@/stores/featureFlagStore';
 import { SUPPORTED_LANGUAGES } from '@/lib/language';
+import { useI18n } from '@/i18n';
 import { toast } from 'sonner';
 
 import { resolveUploadUrl } from '@/lib/platform';
@@ -23,6 +26,9 @@ function avatarSrc(url: string | null | undefined): string | null {
 export function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, updateProfile, uploadAvatar } = useAuth();
+  const experimental = useFeatureFlagStore((s) => s.experimental);
+  const setExperimental = useFeatureFlagStore((s) => s.setExperimental);
+  const { t } = useI18n();
   const [fullName, setFullName] = useState('');
   const [language, setLanguage] = useState('en');
 
@@ -122,6 +128,27 @@ export function ProfilePage() {
             </Select>
           </div>
           <Button onClick={handleSave}>Save Profile</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t('profile.experimental_title', 'Experimental Features')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            {t('profile.experimental_description', 'Enable features that are still in development. These may be incomplete or unstable.')}
+          </p>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="experimental-toggle"
+              checked={experimental}
+              onCheckedChange={setExperimental}
+            />
+            <Label htmlFor="experimental-toggle">
+              {t('profile.experimental_label', 'Enable experimental features')}
+            </Label>
+          </div>
         </CardContent>
       </Card>
     </div>

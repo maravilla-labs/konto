@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,16 +14,28 @@ import { InvoiceAgingChart } from '@/components/dashboard/InvoiceAgingChart';
 import { TopOutstanding } from '@/components/dashboard/TopOutstanding';
 import { OverviewChart } from '@/components/dashboard/OverviewChart';
 import { useI18n } from '@/i18n';
+import { DISCORD_URL } from '@/lib/constants';
 import {
   BookOpen, Users, FileText, FolderKanban,
   TrendingUp, TrendingDown, Wallet, ReceiptText, Plus, Clock,
+  MessageCircle, X,
 } from 'lucide-react';
+
+const BANNER_KEY = 'konto_welcome_dismissed';
 
 export function DashboardPage() {
   const { user } = useAuth();
   const { data: settings } = useSettings();
   const { data, isLoading } = useDashboardStats();
   const { t } = useI18n();
+  const [bannerDismissed, setBannerDismissed] = useState(
+    () => localStorage.getItem(BANNER_KEY) === 'true',
+  );
+
+  function dismissBanner() {
+    localStorage.setItem(BANNER_KEY, 'true');
+    setBannerDismissed(true);
+  }
 
   const numberFormat = settings?.number_format ?? 'ch';
   const dateFormat = settings?.date_format ?? 'dd.MM.yyyy';
@@ -46,6 +59,38 @@ export function DashboardPage() {
         </h2>
         <p className="text-muted-foreground">{t('dashboard.business_overview', 'Business overview')}</p>
       </div>
+
+      {!bannerDismissed && (
+        <Card className="border-[#5865F2]/20 bg-[#5865F2]/5">
+          <CardContent className="flex items-start gap-4 py-4">
+            <MessageCircle className="mt-0.5 h-6 w-6 shrink-0 text-[#5865F2]" />
+            <div className="flex-1 space-y-1">
+              <p className="font-semibold text-sm">
+                {t('dashboard.discord_title', 'Welcome to the beta!')}
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t('dashboard.discord_description', 'This is an early version of Maravilla Konto. We\'d love your feedback — report bugs, request features, or just come hang out on our Discord.')}
+              </p>
+              <a
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-1 text-sm font-medium text-[#5865F2] hover:underline"
+              >
+                {t('dashboard.discord_join', 'Join our Discord')}
+                <span aria-hidden>&rarr;</span>
+              </a>
+            </div>
+            <button
+              onClick={dismissBanner}
+              className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KPI Cards */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">

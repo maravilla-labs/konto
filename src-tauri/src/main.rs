@@ -31,9 +31,12 @@ fn main() {
     let _guard = rt.enter();
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            // Focus the main window when a second instance is launched
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if let Some(window) = app.get_webview_window("main") {
+                // Forward --experimental flag from second instance
+                if args.iter().any(|a| a == "--experimental") {
+                    let _ = window.eval("localStorage.setItem('konto_experimental','true');location.reload()");
+                }
                 let _ = window.set_focus();
             }
         }))
@@ -59,7 +62,14 @@ fn main() {
 
             tracing::info!("Maravilla Konto desktop app started, server on port {port}");
 
+            // Forward --experimental CLI flag to the frontend via localStorage
+            let experimental = std::env::args().any(|a| a == "--experimental");
+
             if let Some(window) = app.get_webview_window("main") {
+                if experimental {
+                    let _ = window.eval("localStorage.setItem('konto_experimental','true')");
+                }
+
                 // On first launch, size window relative to monitor.
                 // On subsequent launches, tauri_plugin_window_state restores saved size.
                 let marker = app_data_dir.join(".window-initialized");

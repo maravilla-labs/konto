@@ -1,0 +1,26 @@
+[package]
+name = "konto-server"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+konto-common = { workspace = true }
+konto-migration = { workspace = true }
+konto-db = { workspace = true }
+konto-core = { workspace = true }
+konto-api = { workspace = true }
+axum = { workspace = true }
+sea-orm = { workspace = true }
+sea-orm-migration = { workspace = true }
+tokio = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+dotenvy = { workspace = true }
+utoipa = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
+uuid = { workspace = true }
+serde = { workspace = true }
+
+[lints]
+workspace = true

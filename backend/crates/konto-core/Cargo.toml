@@ -1,0 +1,37 @@
+[package]
+name = "konto-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+konto-common = { workspace = true }
+konto-db = { workspace = true }
+sea-orm = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+rust_decimal = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+jsonwebtoken = { workspace = true }
+argon2 = "0.5"
+rand = "0.9"
+rand_core = { version = "0.6", features = ["getrandom"] }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+calamine = { workspace = true }
+csv = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+lettre = { workspace = true }
+typst = { workspace = true }
+typst-as-lib = { workspace = true }
+typst-pdf = { workspace = true }
+qrcode = { workspace = true }
+image = { workspace = true }
+quick-xml = { workspace = true }
+utoipa = { workspace = true }
+zip = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,311 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --radius-2xl: calc(var(--radius) + 8px);
+    --radius-3xl: calc(var(--radius) + 12px);
+    --radius-4xl: calc(var(--radius) + 16px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+    --radius: 0.5rem;
+    --background: oklch(0.984 0.003 247);
+    --foreground: oklch(0.15 0.02 250);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.15 0.02 250);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.15 0.02 250);
+    --primary: oklch(0.45 0.15 250);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.01 250);
+    --secondary-foreground: oklch(0.25 0.02 250);
+    --muted: oklch(0.96 0.005 250);
+    --muted-foreground: oklch(0.50 0.02 250);
+    --accent: oklch(0.95 0.02 250);
+    --accent-foreground: oklch(0.25 0.02 250);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.91 0.01 250);
+    --input: oklch(0.91 0.01 250);
+    --ring: oklch(0.45 0.15 250);
+    --chart-1: oklch(0.45 0.15 250);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.55 0.15 160);
+    --chart-4: oklch(0.65 0.18 80);
+    --chart-5: oklch(0.55 0.2 340);
+    --sidebar: oklch(0.22 0.04 250);
+    --sidebar-foreground: oklch(0.92 0.01 250);
+    --sidebar-primary: oklch(0.65 0.18 250);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.28 0.04 250);
+    --sidebar-accent-foreground: oklch(0.92 0.01 250);
+    --sidebar-border: oklch(0.30 0.04 250);
+    --sidebar-ring: oklch(0.65 0.18 250);
+}
+
+.dark {
+    --background: oklch(0.145 0.015 250);
+    --foreground: oklch(0.95 0.01 250);
+    --card: oklch(0.20 0.02 250);
+    --card-foreground: oklch(0.95 0.01 250);
+    --popover: oklch(0.20 0.02 250);
+    --popover-foreground: oklch(0.95 0.01 250);
+    --primary: oklch(0.65 0.18 250);
+    --primary-foreground: oklch(0.15 0.02 250);
+    --secondary: oklch(0.25 0.02 250);
+    --secondary-foreground: oklch(0.95 0.01 250);
+    --muted: oklch(0.25 0.02 250);
+    --muted-foreground: oklch(0.65 0.02 250);
+    --accent: oklch(0.28 0.03 250);
+    --accent-foreground: oklch(0.95 0.01 250);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(0.30 0.02 250);
+    --input: oklch(0.30 0.02 250);
+    --ring: oklch(0.65 0.18 250);
+    --chart-1: oklch(0.55 0.2 250);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.18 0.03 250);
+    --sidebar-foreground: oklch(0.92 0.01 250);
+    --sidebar-primary: oklch(0.55 0.2 250);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.25 0.03 250);
+    --sidebar-accent-foreground: oklch(0.92 0.01 250);
+    --sidebar-border: oklch(0.28 0.03 250);
+    --sidebar-ring: oklch(0.55 0.2 250);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* App-like: no text selection in chrome, only in content areas */
+[data-slot="sidebar"],
+[data-slot="sidebar-inner"],
+[data-slot="sidebar-header"],
+[data-slot="sidebar-footer"],
+[data-slot="sidebar-content"] {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+/* Nav items get pointer cursor */
+[data-slot="sidebar"] a,
+[data-slot="sidebar"] button {
+  cursor: pointer;
+}
+
+/* Collapsed offcanvas sidebar: prevent ghost event capture */
+[data-slot="sidebar"][data-collapsible="offcanvas"] [data-slot="sidebar-container"] {
+  pointer-events: none;
+}
+
+/* Tauri desktop: override CSS variables with transparent versions.
+   border-radius + overflow on <html> propagates to viewport (CSS spec) —
+   viewport-level clipping does NOT create a containing block for
+   position:fixed elements, so the sidebar transition works normally.
+   Sidebar stays opaque (same as web) — no vibrancy on sidebar. */
+html.tauri-desktop:not(.tauri-child-window) {
+  --background: oklch(0.984 0.003 247 / 0.85);
+  --card: oklch(1 0 0 / 0.8);
+  --popover: oklch(1 0 0 / 0.9);
+  --secondary: oklch(0.96 0.01 250 / 0.8);
+  --muted: oklch(0.96 0.005 250 / 0.7);
+  --accent: oklch(0.95 0.02 250 / 0.7);
+  border-radius: 14px !important;
+  overflow: hidden !important;
+}
+
+html.tauri-desktop:not(.tauri-child-window) #root {
+  height: 100vh;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+html.tauri-desktop:not(.tauri-child-window) body {
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Tauri desktop: html/body/root must be fully transparent (main window only) */
+html.tauri-desktop:not(.tauri-child-window),
+html.tauri-desktop:not(.tauri-child-window) body,
+html.tauri-desktop:not(.tauri-child-window) #root {
+  background: transparent !important;
+}
+
+/* Sidebar: match window corner radius on the left side */
+html.tauri-desktop [data-slot="sidebar-inner"] {
+  border-radius: 14px 0 0 14px;
+}
+
+/* TopBar: extra transparency for vibrancy peek-through */
+html.tauri-desktop .tauri-topbar {
+  background: oklch(1 0 0 / 0.45) !important;
+}
+
+/* Login background image — shared between web and Tauri */
+.login-bg {
+  background: url('/bglogin.png') center / cover no-repeat;
+}
+
+/* Tauri login: semi-transparent so vibrancy blends through */
+html.tauri-desktop .login-bg {
+  background: url('/bglogin.png') center / cover no-repeat;
+  opacity: 0.75;
+}
+
+/* Login card: frosted glass over the colorful background */
+.login-card {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: saturate(150%) blur(32px);
+  backdrop-filter: saturate(150%) blur(32px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Logo soft glow on login — tight outline-like halo */
+.login-logo-glow {
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9))
+          drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))
+          drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+}
+
+/* Restyle form inputs for dark-on-glass context */
+.login-card label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.login-card input {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.login-card input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.login-card input:focus {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12) !important;
+}
+
+.login-card button[type="submit"] {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.login-card button[type="submit"]:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Modal surfaces: glass readability in both web and Tauri */
+[data-slot="dialog-overlay"],
+[data-slot="alert-dialog-overlay"],
+[data-slot="sheet-overlay"] {
+  background: rgb(0 0 0 / 0.45) !important;
+}
+
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"],
+[data-slot="sheet-content"],
+[data-slot="command-dialog"] {
+  background: oklch(0.985 0.003 247 / 0.82) !important;
+  border-color: oklch(0.83 0.01 250 / 0.55) !important;
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  backdrop-filter: saturate(140%) blur(18px);
+}
+
+/* Fullscreen: restore opaque variables, remove rounded corners, opaque bg */
+html.tauri-desktop.tauri-fullscreen {
+  --background: oklch(0.984 0.003 247);
+  --card: oklch(1 0 0);
+  --popover: oklch(1 0 0);
+  --secondary: oklch(0.96 0.01 250);
+  --muted: oklch(0.96 0.005 250);
+  --accent: oklch(0.95 0.02 250);
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+html.tauri-desktop.tauri-fullscreen,
+html.tauri-desktop.tauri-fullscreen body,
+html.tauri-desktop.tauri-fullscreen #root {
+  background: var(--background) !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+html.tauri-desktop.tauri-fullscreen .tauri-topbar {
+  background: var(--card) !important;
+}
+
+html.tauri-desktop.tauri-fullscreen .login-bg {
+  opacity: 1;
+}
+
+html.tauri-desktop.tauri-fullscreen [data-slot="dialog-overlay"],
+html.tauri-desktop.tauri-fullscreen [data-slot="alert-dialog-overlay"],
+html.tauri-desktop.tauri-fullscreen [data-slot="sheet-overlay"] {
+  background: rgb(0 0 0 / 0.5) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html.tauri-desktop.tauri-fullscreen [data-slot="dialog-content"],
+html.tauri-desktop.tauri-fullscreen [data-slot="alert-dialog-content"],
+html.tauri-desktop.tauri-fullscreen [data-slot="sheet-content"],
+html.tauri-desktop.tauri-fullscreen [data-slot="command-dialog"] {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

@@ -1,0 +1,32 @@
+# Rust
+/backend/target/
+/src-tauri/target/
+/backend/data/*.db
+/backend/data/*.db-journal
+
+# Node
+/frontend/node_modules/
+/frontend/dist/
+/src-tauri/uploads/
+# Environment
+.env
+.env.local
+/src-tauri/target/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+*.key
+*.csr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Confidential docs
+plan/supporting-docs/
+
+# Claude
+.claude/

@@ -1,0 +1,14 @@
+[package]
+name = "konto-migration"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+sea-orm-migration = { workspace = true }
+uuid = { workspace = true }
+argon2 = { workspace = true }
+chrono = { workspace = true }
+rand_core = { version = "0.6", features = ["getrandom"] }
+
+[lints]
+workspace = true

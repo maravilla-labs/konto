@@ -1,0 +1,16 @@
+[package]
+name = "konto-db"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+konto-common = { workspace = true }
+sea-orm = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+rust_decimal = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

@@ -328,6 +328,11 @@
 - **Rationale**: TipTap is the most mature headless rich text editor for React. Bubble menu provides formatting without permanent toolbar. Separate from existing block-based document editor (TD-007).
 - **Status**: Active
 
+### TD-061: macOS Code Signing & Notarization
+- **Decision**: Add Apple Developer ID code signing and notarization to the GitHub Actions release workflow. Certificate installed into temporary keychain on runner; Tauri picks up signing identity and notarization credentials from env vars.
+- **Rationale**: Without signing, macOS Gatekeeper blocks the DMG. Notarization is required for apps distributed outside the App Store since macOS 10.15.
+- **Status**: Active (requires Apple Developer Program enrollment and GitHub secrets setup)
+
 ### TD-060: HTML-to-Markdown Data Migration
 - **Decision**: Migration M088 converts HTML content in 13 columns across 10 tables to Markdown. Inline conversion (no external crate) handles `<br>`, `<ul>/<li>`, `<strong>`, `<em>`, `<p>` — all patterns found in legacy HTML imports. Only processes rows containing HTML tags.
 - **Rationale**: One-time migration keeps data clean. Idempotent: plain text passes through unchanged.

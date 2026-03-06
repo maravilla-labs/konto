@@ -126,12 +126,42 @@ The release workflow:
 1. Builds artifacts and creates a GitHub Release
 2. Deploys artifacts + `latest.json` + release notes to the `gh-pages` branch
 
+## macOS Code Signing & Notarization
+
+Without code signing, macOS Gatekeeper blocks the DMG ("Apple could not verify..."). The release workflow handles signing and notarization automatically when the required secrets are set.
+
+### Prerequisites (one-time setup)
+
+1. **Enroll in Apple Developer Program** ($99/year) at https://developer.apple.com/programs/
+2. **Create a Developer ID Application certificate** in Certificates, Identifiers & Profiles
+3. **Export the certificate as .p12** from Keychain Access (with a password)
+4. **Base64-encode the .p12**: `base64 -i certificate.p12 | pbcopy`
+5. **Generate an app-specific password** at https://appleid.apple.com (Security → App-Specific Passwords)
+6. **Add the GitHub repository secrets** listed below
+
+### How it works
+
+The workflow installs the .p12 certificate into a temporary keychain on the macOS runner. Tauri's build process picks up the `APPLE_SIGNING_IDENTITY` env var to code-sign the binary, and `APPLE_ID` / `APPLE_PASSWORD` / `APPLE_TEAM_ID` to submit for notarization. These env vars are ignored on Windows runners.
+
+### Verification
+
+After setting up secrets and pushing a new tag:
+- The macOS build log should show "signing with identity" and "notarization submitted"
+- The downloaded DMG should open without a Gatekeeper warning
+- Windows builds are unaffected
+
 ## GitHub Secrets
 
 | Secret | Purpose |
 |---|---|
 | `TAURI_SIGNING_PRIVATE_KEY` | Signs updater artifacts |
 | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | Password for the signing key |
+| `APPLE_CERTIFICATE` | Base64-encoded .p12 Developer ID certificate |
+| `APPLE_CERTIFICATE_PASSWORD` | Password for the .p12 file |
+| `APPLE_SIGNING_IDENTITY` | e.g. `Developer ID Application: Your Name (TEAM_ID)` |
+| `APPLE_ID` | Apple ID email (for notarization) |
+| `APPLE_PASSWORD` | App-specific password (for notarization) |
+| `APPLE_TEAM_ID` | 10-character Apple team ID |
 
 ## Workflow File
 

@@ -26,7 +26,12 @@ pub async fn start_embedded_server(app_data_dir: PathBuf) -> u16 {
         jwt_refresh_expires_secs: 604800,
         server_host: "127.0.0.1".to_string(),
         server_port: 0, // OS picks free port
-        cors_origin: "tauri://localhost,https://tauri.localhost,http://localhost:5173".to_string(),
+        // Webview origin differs per platform:
+        //   macOS/Linux: tauri://localhost
+        //   Windows (WebView2): http://tauri.localhost
+        //   iOS:        https://tauri.localhost
+        // http://localhost:5173 is the Vite dev server.
+        cors_origin: "tauri://localhost,http://tauri.localhost,https://tauri.localhost,http://localhost:5173".to_string(),
     };
 
     let storage = Arc::new(LocalStorage::new(

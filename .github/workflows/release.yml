@@ -107,6 +107,20 @@ jobs:
             -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
+      # Only export notarization env vars when a real Apple certificate is
+      # configured. Passing empty APPLE_ID/APPLE_PASSWORD/APPLE_TEAM_ID still
+      # triggers tauri's notarization path and fails with
+      # "Team ID must be at least 3 characters".
+      - name: Configure Apple notarization env
+        if: matrix.platform == 'macos-latest' && env.APPLE_CERTIFICATE != '' && env.APPLE_ID != ''
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+        run: |
+          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> "$GITHUB_ENV"
+          echo "APPLE_PASSWORD=${{ secrets.APPLE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> "$GITHUB_ENV"
+
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
@@ -115,9 +129,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Use ad-hoc signing (-) when no Apple certificate is configured
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY || '-' }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tauriScript: npx --prefix frontend tauri
           args: ${{ matrix.args }}

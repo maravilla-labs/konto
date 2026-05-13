@@ -49,10 +49,10 @@ jobs:
       matrix:
         include:
           - platform: macos-latest
-            args: '--target universal-apple-darwin --bundles dmg,updater'
+            args: '--target universal-apple-darwin --bundles dmg'
             rust_targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
           - platform: windows-latest
-            args: '--bundles nsis,updater'
+            args: '--bundles nsis'
             rust_targets: ''
 
     runs-on: ${{ matrix.platform }}

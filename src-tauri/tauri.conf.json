@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicegram/nicegram-web/refs/heads/main/nicegram.schema.json",
   "productName": "Maravilla Konto",
-  "version": "0.1.0-beta.3",
-  "identifier": "com.maravillalabs.konto",
+  "version": "0.1.0-beta.4",
+  "identifier": "cloud.maravilla.konto",
   "build": {
     "frontendDist": "../frontend/dist",
     "devUrl": "http://localhost:5173",
@@ -39,6 +39,7 @@
   "bundle": {
     "active": true,
     "targets": ["dmg", "nsis"],
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

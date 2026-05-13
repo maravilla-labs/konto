@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0-beta.5",
+  "notes": "# Signed macOS Builds & Working Auto-Updater\n\nThis release closes two large gaps in the desktop distribution: macOS Gatekeeper now trusts the app out of the box, and the in-app auto-updater is wired up end-to-end for the first time. (Tag `beta.4` was a partial release where the Windows build failed at signing — beta.5 supersedes it.)\n\n## Highlights\n\n- **macOS: signed and notarized** — The DMG is now signed with a Developer ID Application certificate and notarized by Apple. On first launch you'll see a single \"Are you sure you want to open?\" prompt instead of the previous \"Apple cannot check this for malicious software\" warning. No more right-click-Open workaround.\n- **Auto-updates now work** — Previous betas were silently shipping without a valid `latest.json`, so the in-app updater could never detect a new version. The Tauri v2 `createUpdaterArtifacts` opt-in was missing — adding it (together with the `app` bundle target on macOS) makes the build produce properly-named updater bundles and signatures, which the release workflow then publishes to the update endpoint.\n\n## Heads-up for existing beta users (macOS)\n\nThe bundle identifier changed from `com.maravillalabs.konto` to `cloud.maravilla.konto` to match the new App ID registered in our Apple Developer account. macOS treats this as a different application, so:\n\n- The old beta.3 build will remain in `/Applications` until you delete it manually.\n- The new beta.5 build starts with a fresh app sandbox — settings, cached data and local storage from beta.3 will not carry over.\n- The in-app updater can't bridge this transition; download beta.5 manually from the Releases page one final time. Updates from beta.5 onwards will install automatically.\n\n## Feedback\n\nJoin us on [Discord](https://discord.gg/bXTGfCY9) or open an issue on [GitHub](https://github.com/maravilla-labs/konto/issues).",
+  "pub_date": "2026-05-13T10:36:16.152Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2FLMU1VU0NTRENVT2pBWHVJV1ZxWDFrWG41dytLWFJJTUFHU0tLT2ROTVVueGMyUmQ3b2RuNFZmelVVaUFNeGliUGJXOUllOVE1bTJUZ1ZBbUduNFFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4MzYyCWZpbGU6TWFyYXZpbGxhIEtvbnRvXzAuMS4wLWJldGEuNV94NjQtc2V0dXAuZXhlCndoMWRsVVBPQmhxbnIwcXQ1bnlyMDNPWkJvSnd0ay9XT1NiV3hRVnlqTHNRMVlMSUxtNnUwM3Rqc21uelBWQ3h2NDQvTThST21sQ3dJVC92QUQ5bkN3PT0K",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_0.1.0-beta.5_x64-setup.exe"
+    },
+    "windows-x86_64-nsis": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2FLMU1VU0NTRENVT2pBWHVJV1ZxWDFrWG41dytLWFJJTUFHU0tLT2ROTVVueGMyUmQ3b2RuNFZmelVVaUFNeGliUGJXOUllOVE1bTJUZ1ZBbUduNFFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4MzYyCWZpbGU6TWFyYXZpbGxhIEtvbnRvXzAuMS4wLWJldGEuNV94NjQtc2V0dXAuZXhlCndoMWRsVVBPQmhxbnIwcXQ1bnlyMDNPWkJvSnd0ay9XT1NiV3hRVnlqTHNRMVlMSUxtNnUwM3Rqc21uelBWQ3h2NDQvTThST21sQ3dJVC92QUQ5bkN3PT0K",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_0.1.0-beta.5_x64-setup.exe"
+    },
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2V4SFpmWGhGZFhTUVBGa0FoWGZwWVVvREhyQnZodm5XR0ZXQzZoazBzd3VFMzNkenBmS0VCd1luRkJxODZFbG1oT2Q3ZW1TbE9RZU1mQXRzT2RvN0FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4NTYzCWZpbGU6TWFyYXZpbGxhIEtvbnRvLmFwcC50YXIuZ3oKRllUSEZUNkNiWEdIV3VVbS96OUtidUsrWHV1bUpJVGZzUVg0WmVmbkN2RWhnR3REVHgrTGpiaGFySy9rZlZtOUppYXR1ZGUxVHNKdk8wUTZ0dEtDRHc9PQo=",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_universal.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2V4SFpmWGhGZFhTUVBGa0FoWGZwWVVvREhyQnZodm5XR0ZXQzZoazBzd3VFMzNkenBmS0VCd1luRkJxODZFbG1oT2Q3ZW1TbE9RZU1mQXRzT2RvN0FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4NTYzCWZpbGU6TWFyYXZpbGxhIEtvbnRvLmFwcC50YXIuZ3oKRllUSEZUNkNiWEdIV3VVbS96OUtidUsrWHV1bUpJVGZzUVg0WmVmbkN2RWhnR3REVHgrTGpiaGFySy9rZlZtOUppYXR1ZGUxVHNKdk8wUTZ0dEtDRHc9PQo=",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_universal.app.tar.gz"
+    },
+    "darwin-aarch64-app": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2V4SFpmWGhGZFhTUVBGa0FoWGZwWVVvREhyQnZodm5XR0ZXQzZoazBzd3VFMzNkenBmS0VCd1luRkJxODZFbG1oT2Q3ZW1TbE9RZU1mQXRzT2RvN0FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4NTYzCWZpbGU6TWFyYXZpbGxhIEtvbnRvLmFwcC50YXIuZ3oKRllUSEZUNkNiWEdIV3VVbS96OUtidUsrWHV1bUpJVGZzUVg0WmVmbkN2RWhnR3REVHgrTGpiaGFySy9rZlZtOUppYXR1ZGUxVHNKdk8wUTZ0dEtDRHc9PQo=",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_universal.app.tar.gz"
+    },
+    "darwin-x86_64-app": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVlFDYkJBRGQ2Z2V4SFpmWGhGZFhTUVBGa0FoWGZwWVVvREhyQnZodm5XR0ZXQzZoazBzd3VFMzNkenBmS0VCd1luRkJxODZFbG1oT2Q3ZW1TbE9RZU1mQXRzT2RvN0FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc4NjY4NTYzCWZpbGU6TWFyYXZpbGxhIEtvbnRvLmFwcC50YXIuZ3oKRllUSEZUNkNiWEdIV3VVbS96OUtidUsrWHV1bUpJVGZzUVg0WmVmbkN2RWhnR3REVHgrTGpiaGFySy9rZlZtOUppYXR1ZGUxVHNKdk8wUTZ0dEtDRHc9PQo=",
+      "url": "https://github.com/maravilla-labs/konto/releases/download/v0.1.0-beta.5/Maravilla.Konto_universal.app.tar.gz"
+    }
+  }
+}

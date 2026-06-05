@@ -1,0 +1,17 @@
+# cargo-audit configuration for the Tauri desktop crate.
+# See https://github.com/rustsec/rustsec/tree/main/cargo-audit
+#
+# Only non-actionable advisories are ignored, each assessed below. Every
+# fixable advisory is resolved by upgrading the dependency, not ignored.
+# Unmaintained-crate warnings (the gtk-rs GTK3 cluster pulled in by Tauri's
+# Linux webview, plus assorted transitives) are left visible on purpose — they
+# are informational, do not fail the audit, and flag real future maintenance.
+[advisories]
+ignore = [
+    # rsa Marvin timing attack. Reachable only via sqlx-mysql, which is never
+    # compiled (SQLite-only). No fixed upstream version exists regardless.
+    "RUSTSEC-2023-0071",
+    # rand unsoundness that only triggers with a custom global logger calling
+    # rand::rng() reentrantly — not a pattern we use. No patched 0.8.x exists.
+    "RUSTSEC-2026-0097",
+]

@@ -1,0 +1,22 @@
+# cargo-audit configuration — see https://github.com/rustsec/rustsec/tree/main/cargo-audit
+#
+# Each ignored advisory below has been individually assessed as not actionable
+# for this project. Re-review whenever dependencies change. All genuinely
+# fixable advisories are resolved by upgrading (not ignored).
+[advisories]
+ignore = [
+    # rsa Marvin timing attack. Reachable ONLY via sqlx-mysql, which this
+    # project never compiles (SQLite/Postgres-feature only; cargo tree -i rsa
+    # is empty). No fixed upstream version exists regardless.
+    "RUSTSEC-2023-0071",
+    # rand unsoundness that only manifests with a custom global logger calling
+    # rand::rng() reentrantly — not a pattern we use. No patched 0.8.x exists;
+    # pulled transitively by the typst PDF stack (rust_decimal/lipsum).
+    "RUSTSEC-2026-0097",
+    # bincode unmaintained (not a vulnerability). Transitive via typst → syntect.
+    "RUSTSEC-2025-0141",
+    # paste unmaintained (not a vulnerability). Transitive via typst → hayagriva.
+    "RUSTSEC-2024-0436",
+    # yaml-rust unmaintained (not a vulnerability). Transitive via typst → syntect.
+    "RUSTSEC-2024-0320",
+]

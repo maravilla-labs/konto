@@ -4,7 +4,10 @@
 mod commands;
 mod server;
 
-use commands::{get_app_version, get_server_port, reset_database, set_server_port};
+use commands::{
+    crypto_change_password, crypto_disable_password, crypto_enable_password, crypto_status,
+    crypto_unlock, get_app_version, get_server_port, reset_database, set_server_port,
+};
 use tauri::Manager;
 use tauri::PhysicalSize;
 
@@ -48,19 +51,33 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![get_server_port, get_app_version, reset_database])
+        .invoke_handler(tauri::generate_handler![
+            get_server_port,
+            get_app_version,
+            reset_database,
+            crypto_status,
+            crypto_unlock,
+            crypto_enable_password,
+            crypto_change_password,
+            crypto_disable_password
+        ])
         .setup(move |app| {
             let app_data_dir = app
                 .path()
                 .app_data_dir()
                 .expect("Failed to get app data directory");
 
-            // Spawn the embedded Axum server
-            let data_dir = app_data_dir.clone();
-            let port = rt.block_on(server::start_embedded_server(data_dir));
-            set_server_port(port);
-
-            tracing::info!("Maravilla Konto desktop app started, server on port {port}");
+            // Resolve the encryption key and (unless locked behind a master
+            // password) start the embedded Axum server.
+            match server::init(rt, app_data_dir.clone()) {
+                server::InitOutcome::Ready(port) => {
+                    set_server_port(port);
+                    tracing::info!("Maravilla Konto started, server on port {port}");
+                }
+                server::InitOutcome::Locked => {
+                    tracing::info!("Awaiting master password; server not yet started");
+                }
+            }
 
             // Forward --experimental CLI flag to the frontend via localStorage
             let experimental = std::env::args().any(|a| a == "--experimental");

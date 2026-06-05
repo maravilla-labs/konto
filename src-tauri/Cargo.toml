@@ -1,6 +1,6 @@
 [package]
 name = "maravilla-konto"
-version = "0.1.0-beta.5"
+version = "0.1.0-beta.6"
 edition = "2024"
 description = "Maravilla Konto - Swiss Accounting"
 license = "MIT"
@@ -27,6 +27,8 @@ konto-server = { path = "../backend/crates/konto-server" }
 konto-common = { path = "../backend/crates/konto-common" }
 konto-core = { path = "../backend/crates/konto-core" }
 konto-api = { path = "../backend/crates/konto-api" }
+konto-crypto = { path = "../backend/crates/konto-crypto" }
+konto-db = { path = "../backend/crates/konto-db" }
 
 # Async runtime
 tokio = { version = "1", features = ["full"] }

@@ -8,9 +8,12 @@ use konto_core::services::dunning_service::DunningService;
 use konto_core::services::recurring_invoice_service::RecurringInvoiceService;
 use konto_core::services::scheduler_service::SchedulerService;
 use konto_core::services::storage::StorageService;
-use konto_db::connection::establish_connection;
+use konto_crypto::{Dek, KeyResolver, ENV_MASTER_KEY};
+use konto_db::connection::{establish_connection, establish_sqlite};
+use konto_db::encrypt_migrate::{encrypt_existing_database, is_plaintext_sqlite};
 use konto_migration::Migrator;
 use sea_orm::DatabaseConnection;
+use std::path::PathBuf;
 use sea_orm_migration::MigratorTrait;
 use std::sync::Arc;
 use std::time::Duration;
@@ -23,16 +26,66 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::openapi::ApiDoc;
 use crate::router::build_router;
 
-/// Build the application state: connect to DB, run migrations, init JWT.
+/// Extract the file path from a `sqlite:` URL, or `None` for in-memory or
+/// non-SQLite (e.g. PostgreSQL) URLs.
+fn sqlite_file_path(database_url: &str) -> Option<PathBuf> {
+    let rest = database_url.strip_prefix("sqlite:")?;
+    let rest = rest.strip_prefix("//").unwrap_or(rest);
+    let path = rest.split('?').next().unwrap_or(rest);
+    if path.is_empty() || path == ":memory:" {
+        return None;
+    }
+    Some(PathBuf::from(path))
+}
+
+/// Establish the database connection for a given config, honoring SQLCipher
+/// encryption at rest. For `sqlite:` file URLs the DEK is resolved from
+/// `KONTO_MASTER_KEY` / keychain (via the file's parent dir) when available; a
+/// missing key falls back to an unencrypted connection. Non-SQLite URLs connect
+/// unchanged (encryption handled by the server/infra).
+#[allow(clippy::expect_used)]
+pub async fn connect_database(config: &AppConfig) -> DatabaseConnection {
+    match sqlite_file_path(&config.database_url) {
+        Some(path) => {
+            // Only attempt key resolution on the server path when an explicit
+            // env key is provided; otherwise stay unencrypted for compatibility.
+            let dek: Option<Dek> = if std::env::var(ENV_MASTER_KEY).is_ok() {
+                let dir = path.parent().map(PathBuf::from).unwrap_or_default();
+                Some(
+                    KeyResolver::new(dir)
+                        .resolve(None)
+                        .expect("Failed to resolve database encryption key"),
+                )
+            } else {
+                None
+            };
+            // Encrypt a pre-existing plaintext database on first keyed launch.
+            if let Some(dek) = dek.as_ref() {
+                if is_plaintext_sqlite(&path) {
+                    encrypt_existing_database(&path, dek)
+                        .await
+                        .expect("Failed to encrypt existing database");
+                }
+            }
+            establish_sqlite(&path, dek.as_ref())
+                .await
+                .expect("Failed to connect to SQLite database")
+        }
+        None => establish_connection(&config.database_url)
+            .await
+            .expect("Failed to connect to database"),
+    }
+}
+
+/// Build the application state from an established DB connection: run
+/// migrations and init JWT. The caller establishes the connection (encrypted or
+/// not) so it controls key resolution; see [`connect_database`].
 #[allow(clippy::expect_used)]
 pub async fn build_state(
     config: &AppConfig,
     storage: Arc<dyn StorageService>,
+    db: DatabaseConnection,
 ) -> AppState {
-    let db = establish_connection(&config.database_url)
-        .await
-        .expect("Failed to connect to database");
-
     Migrator::up(&db, None)
         .await
         .expect("Failed to run migrations");
@@ -202,7 +255,8 @@ pub async fn run_standalone() {
         konto_core::services::storage::local::LocalStorage::new("./data/uploads"),
     );
 
-    let state = build_state(&config, storage).await;
+    let db = connect_database(&config).await;
+    let state = build_state(&config, storage, db).await;
     spawn_schedulers(&state.db);
 
     let app = build_app(state, &config.cors_origin);

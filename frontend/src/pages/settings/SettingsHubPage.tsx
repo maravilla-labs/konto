@@ -79,6 +79,7 @@ const sections: SettingsSection[] = [
     icon: UserCog,
     links: [
       { label: 'Users', path: '/settings/users' },
+      { label: 'Security', path: '/settings/security' },
       { label: 'Data Import', path: '/import' },
     ],
   },

@@ -17,10 +17,43 @@ pub fn get_app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
+// ---- Encryption at rest ----
+
+/// Current encryption mode and unlock state (drives the unlock gate + settings).
+#[tauri::command]
+pub fn crypto_status() -> Result<crate::server::CryptoStatus, String> {
+    crate::server::status()
+}
+
+/// Unlock the database with the master password and start the server.
+#[tauri::command]
+pub fn crypto_unlock(password: String) -> Result<u16, String> {
+    let port = crate::server::unlock(&password)?;
+    set_server_port(port);
+    Ok(port)
+}
+
+/// Enable a master password (switches from transparent keychain mode).
+#[tauri::command]
+pub fn crypto_enable_password(password: String) -> Result<(), String> {
+    crate::server::enable_password(&password)
+}
+
+/// Change the master password.
+#[tauri::command]
+pub fn crypto_change_password(old_password: String, new_password: String) -> Result<(), String> {
+    crate::server::change_password(&old_password, &new_password)
+}
+
+/// Disable the master password (back to transparent keychain mode).
+#[tauri::command]
+pub fn crypto_disable_password(password: String) -> Result<(), String> {
+    crate::server::disable_password(&password)
+}
+
 #[tauri::command]
 pub fn reset_database(app: tauri::AppHandle) -> Result<(), String> {
     let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
-    let db_path = app_data_dir.join("maravilla.db");
 
     // Also remove SQLite WAL/SHM files if present
     for ext in &["", "-wal", "-shm"] {

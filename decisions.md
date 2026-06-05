@@ -337,3 +337,25 @@
 - **Decision**: Migration M088 converts HTML content in 13 columns across 10 tables to Markdown. Inline conversion (no external crate) handles `<br>`, `<ul>/<li>`, `<strong>`, `<em>`, `<p>` — all patterns found in legacy HTML imports. Only processes rows containing HTML tags.
 - **Rationale**: One-time migration keeps data clean. Idempotent: plain text passes through unchanged.
 - **Status**: Active
+
+## Sprint 18
+
+### TD-062: Encryption at Rest (SQLCipher + AES-GCM uploads)
+- **Decision**: Encrypt all data at rest with a single 32-byte Data Encryption Key (DEK). The SQLite database is encrypted with **SQLCipher** (AES-256, page-level) by forcing `libsqlite3-sys` to `bundled-sqlcipher-vendored-openssl` (version-matched to sqlx 0.8.6 → libsqlite3-sys 0.30.1, feature-unified) and applying the raw-key `PRAGMA key = "x'<hex>'"` via a sqlx pool handed to SeaORM with `SqlxSqliteConnector::from_sqlx_sqlite_pool`. Uploaded files are encrypted with **AES-256-GCM** via an `EncryptedStorage` decorator over `StorageService`. The JWT secret moves from `secret.key` into the OS keychain. New crate `konto-crypto` owns all primitives.
+- **Rationale**: Swiss accounting data (10-year retention) must be protected against device/disk/backup theft. SQLCipher is transparent below the ORM (zero entity/query changes). One DEK keeps DB + files + secret consistent.
+- **Status**: Active
+
+### TD-063: Portable Key Provider (keychain + env + master password)
+- **Decision**: `KeyResolver` resolves the DEK from a chain: `KONTO_MASTER_KEY` env var (server/Docker/K8s secret) → OS keychain (desktop, via `keyring`) → first-run generate-into-keychain. Optionally the DEK is wrapped by an **Argon2id**-derived key from a user master password; the wrapped blob + KDF params live in `keystore.json` (no plaintext key on disk). `keystore.json` records the active mode (`keychain` | `password`); env mode is implicit. DEK indirection means changing the password only re-wraps the DEK, never re-encrypts the DB.
+- **Rationale**: Same code path works on desktop (transparent keychain) and server (injected env secret), matching how `DATABASE_URL`/`JWT_SECRET` are supplied. Master password adds zero-knowledge protection for users who want it, without forcing the forgotten-password data-loss risk on everyone. On PostgreSQL the SQLCipher layer is N/A (handled by server/infra TDE); uploads/secret encryption stays portable.
+- **Status**: Active
+
+### TD-064: Master-Password Unlock Ordering (Tauri)
+- **Decision**: In password mode the embedded Axum server is **not** started at `setup()`. `server::init` returns `Locked`; the React `UnlockGate` (rendered before `AppRoutes`) calls the `crypto_unlock` command, which resolves the DEK and starts the server, then reloads the webview so the API client picks up the port. Enable/change/disable password are Tauri commands surfaced on a Settings → Security page. No `window.prompt` is used (forbidden in WKWebView).
+- **Rationale**: The server cannot open the DB without the key, so unlock must precede server start. Keeping the gate in the main window (vs. a separate native prompt window) avoids capability-scoping pitfalls and reuses the i18n/UI stack.
+- **Status**: Active
+
+### TD-065: Transparent One-Time Migration of Existing Plaintext Data
+- **Decision**: On first encrypted launch, an existing plaintext `maravilla.db` is detected by its `SQLite format 3\0` header and converted in place via SQLCipher `sqlcipher_export` into a temp file that is **verified to open under the key before** atomically replacing the original. No plaintext backup is retained and stale plaintext `-wal`/`-shm` sidecars are deleted. Existing plaintext uploads are re-encrypted by an idempotent directory walk (already-encrypted files authenticate and are skipped); on download, content that fails authentication is treated as legacy plaintext and returned as-is.
+- **Rationale**: Beta users already have plaintext databases/files; the upgrade must be seamless and must not leave a plaintext copy on disk (which would defeat the feature). Verify-before-replace prevents data loss if export fails.
+- **Status**: Active

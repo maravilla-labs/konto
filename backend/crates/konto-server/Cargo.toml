@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 konto-common = { workspace = true }
+konto-crypto = { workspace = true }
 konto-migration = { workspace = true }
 konto-db = { workspace = true }
 konto-core = { workspace = true }

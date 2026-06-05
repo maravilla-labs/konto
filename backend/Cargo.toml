@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/konto-common",
+    "crates/konto-crypto",
     "crates/konto-migration",
     "crates/konto-db",
     "crates/konto-core",
@@ -17,7 +18,7 @@ print_stdout = "deny"
 print_stderr = "warn"
 
 [workspace.package]
-version = "0.1.0-beta.5"
+version = "0.1.0-beta.6"
 edition = "2024"
 license = "MIT"
 
@@ -34,6 +35,11 @@ tower-http = { version = "0.6", features = ["cors", "trace", "fs", "set-header"]
 # Database
 sea-orm = { version = "1.1", features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros", "with-uuid", "with-chrono", "with-rust_decimal"] }
 sea-orm-migration = { version = "1.1", features = ["sqlx-sqlite", "runtime-tokio-rustls"] }
+sqlx = { version = "0.8", default-features = false, features = ["sqlite", "runtime-tokio-rustls"] }
+# Forces the libsqlite3-sys that sqlx links to be built as SQLCipher (AES-256
+# page-level encryption at rest). Version MUST match sqlx-sqlite's libsqlite3-sys
+# (0.30.x for sqlx 0.8) so cargo feature-unifies a single build.
+libsqlite3-sys = { version = "0.30", features = ["bundled-sqlcipher-vendored-openssl"] }
 
 # Serialization
 serde = { version = "1", features = ["derive"] }
@@ -47,6 +53,13 @@ rust_decimal = { version = "1", features = ["serde-with-str"] }
 # Auth
 jsonwebtoken = "9"
 argon2 = "0.5"
+
+# Encryption at rest
+aes-gcm = "0.10"
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+zeroize = { version = "1", features = ["derive"] }
+hex = "0.4"
+base64 = "0.22"
 
 # OpenAPI
 utoipa = { version = "5", features = ["uuid", "chrono"] }
@@ -88,6 +101,7 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 
 # Internal crates
 konto-common = { path = "crates/konto-common" }
+konto-crypto = { path = "crates/konto-crypto" }
 konto-migration = { path = "crates/konto-migration" }
 konto-db = { path = "crates/konto-db" }
 konto-core = { path = "crates/konto-core" }

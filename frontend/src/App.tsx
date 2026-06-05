@@ -66,6 +66,7 @@ import { ReconciliationPage } from '@/pages/ReconciliationPage';
 import { AnnualReportPage } from '@/pages/AnnualReportPage';
 import { ShareholdersPage } from '@/pages/settings/ShareholdersPage';
 import { SettingsHubPage } from '@/pages/settings/SettingsHubPage';
+import { SecuritySettingsPage } from '@/pages/settings/SecuritySettingsPage';
 import { SalesHubPage, FinanceHubPage, CrmHubPage } from '@/pages/CategoryHubPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { TimesheetsPage } from '@/pages/TimesheetsPage';
@@ -86,6 +87,7 @@ import { SetupPage } from '@/pages/SetupPage';
 import { PdfViewPage } from '@/pages/PdfViewPage';
 import { I18nProvider } from '@/i18n';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { UnlockGate } from '@/components/auth/UnlockGate';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -198,6 +200,7 @@ function AppRoutes() {
           <Route path="/settings/employees" element={<RoleGuard roles={['admin']}><EmployeesPage /></RoleGuard>} />
           <Route path="/settings/payroll-settings" element={<RoleGuard roles={['admin']}><PayrollSettingsPage /></RoleGuard>} />
           <Route path="/settings/project-sub-statuses" element={<RoleGuard roles={['admin']}><ProjectSubStatusesPage /></RoleGuard>} />
+          <Route path="/settings/security" element={<RoleGuard roles={['admin']}><SecuritySettingsPage /></RoleGuard>} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -211,7 +214,9 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <BrowserRouter>
-            <AppRoutes />
+            <UnlockGate>
+              <AppRoutes />
+            </UnlockGate>
             <Toaster position="bottom-right" richColors />
           </BrowserRouter>
         </TooltipProvider>

@@ -5,12 +5,19 @@ edition.workspace = true
 
 [dependencies]
 konto-common = { workspace = true }
+konto-crypto = { workspace = true }
 sea-orm = { workspace = true }
+sqlx = { workspace = true }
+# Forces the linked SQLite to be built as SQLCipher (encryption at rest).
+# Must stay in the dep graph so cargo feature-unifies it with sqlx-sqlite.
+libsqlite3-sys = { workspace = true }
 uuid = { workspace = true }
 chrono = { workspace = true }
 rust_decimal = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
 
 [lints]
 workspace = true

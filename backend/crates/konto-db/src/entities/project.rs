@@ -33,7 +33,7 @@ pub struct Model {
     pub hard_budget_amount: Option<rust_decimal::Decimal>,
     pub contact_person_id: Option<String>,
     pub invoicing_method: String,
-    pub currency: String,
+    pub currency_id: Option<String>,
     pub rounding_method: Option<String>,
     pub rounding_factor_minutes: Option<i32>,
     #[sea_orm(column_type = "Decimal(Some((15, 2)))", nullable)]
@@ -57,11 +57,23 @@ pub enum Relation {
     TimeEntries,
     #[sea_orm(has_many = "super::project_member::Entity")]
     ProjectMembers,
+    #[sea_orm(
+        belongs_to = "super::currency::Entity",
+        from = "Column::CurrencyId",
+        to = "super::currency::Column::Id"
+    )]
+    Currency,
 }
 
 impl Related<super::contact::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Contact.def()
+    }
+}
+
+impl Related<super::currency::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Currency.def()
     }
 }
 

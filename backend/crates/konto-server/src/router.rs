@@ -167,12 +167,15 @@ pub fn build_router(state: AppState) -> Router {
         // Exchange Rates
         .route("/api/v1/exchange-rates", get(exchange_rate_handler::list_exchange_rates).post(exchange_rate_handler::create_exchange_rate))
         .route("/api/v1/exchange-rates/latest", get(exchange_rate_handler::get_latest_rate))
+        .route("/api/v1/exchange-rates/fetch-latest", post(exchange_rate_handler::fetch_latest_rates))
         .route(
             "/api/v1/exchange-rates/{id}",
             get(exchange_rate_handler::get_exchange_rate)
                 .put(exchange_rate_handler::update_exchange_rate)
                 .delete(exchange_rate_handler::delete_exchange_rate),
         )
+        // Currency Exchanges (inter-account transfers, FX gain/loss realization)
+        .route("/api/v1/currency-exchanges", get(currency_exchange_handler::list_currency_exchanges).post(currency_exchange_handler::record_transfer))
         // Invoices
         .route("/api/v1/invoices", get(invoice_handler::list_invoices).post(invoice_handler::create_invoice))
         .route("/api/v1/invoices/from-time-entries", post(invoice_handler::create_invoice_from_time_entries))

@@ -25,6 +25,7 @@ impl CurrencyService {
             name: Set(name.to_string()),
             symbol: Set(symbol.to_string()),
             is_primary: Set(false),
+            default_bank_account_id: Set(None),
         };
         CurrencyRepo::create(db, model)
             .await
@@ -37,6 +38,7 @@ impl CurrencyService {
         code: &str,
         name: &str,
         symbol: &str,
+        default_bank_account_id: Option<String>,
     ) -> Result<currency::Model, AppError> {
         let existing = CurrencyRepo::find_by_id(db, id)
             .await
@@ -47,6 +49,7 @@ impl CurrencyService {
         model.code = Set(code.to_string());
         model.name = Set(name.to_string());
         model.symbol = Set(symbol.to_string());
+        model.default_bank_account_id = Set(default_bank_account_id);
 
         CurrencyRepo::update(db, model)
             .await

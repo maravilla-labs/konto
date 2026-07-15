@@ -34,13 +34,11 @@ impl BankReconciliationService {
             .await
             .map_err(|e| AppError::Database(e.to_string()))?
             .ok_or_else(|| AppError::NotFound("Bank account not found".into()))?;
-
-        let payment_account_id = bank_account
-            .account_id
-            .as_deref()
-            .ok_or_else(|| {
-                AppError::Validation("Bank account has no linked ledger account".into())
-            })?;
+        if bank_account.account_id.is_none() {
+            return Err(AppError::Validation(
+                "Bank account has no linked ledger account".into(),
+            ));
+        }
 
         let transactions = BankTransactionRepo::find_unmatched_by_account(db, bank_account_id)
             .await
@@ -73,7 +71,8 @@ impl BankReconciliationService {
                             db,
                             &inv.id,
                             tx.transaction_date,
-                            payment_account_id,
+                            bank_account_id,
+                            None,
                             user_id,
                         )
                         .await;
@@ -93,7 +92,8 @@ impl BankReconciliationService {
                         db,
                         &inv.id,
                         tx.transaction_date,
-                        payment_account_id,
+                        bank_account_id,
+                        None,
                         user_id,
                     )
                     .await;
@@ -150,7 +150,8 @@ impl BankReconciliationService {
                     db,
                     target_id,
                     tx.transaction_date,
-                    payment_account_id,
+                    &tx.bank_account_id,
+                    None,
                     user_id,
                 )
                 .await?;

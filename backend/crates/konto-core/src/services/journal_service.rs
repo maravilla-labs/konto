@@ -131,6 +131,22 @@ impl JournalService {
 
         let mut created_lines = Vec::new();
         for line in lines {
+            // debit/credit amounts are always in the base (ledger) currency. When the
+            // entry carries an exchange rate (foreign-currency invoice/payment/exchange),
+            // derive each line's original face-value amount for informational display —
+            // one rate per entry matches how a single transaction is actually booked.
+            let (currency_amount, base_currency_amount) = match exchange_rate {
+                Some(rate) if rate != Decimal::ZERO => {
+                    let base_amount = if line.debit_amount > Decimal::ZERO {
+                        line.debit_amount
+                    } else {
+                        line.credit_amount
+                    };
+                    (Some(base_amount / rate), Some(base_amount))
+                }
+                _ => (None, None),
+            };
+
             let line_model = journal_line::ActiveModel {
                 id: Set(Uuid::new_v4().to_string()),
                 journal_entry_id: Set(entry_id.clone()),
@@ -139,8 +155,8 @@ impl JournalService {
                 credit_amount: Set(line.credit_amount),
                 description: Set(line.description),
                 vat_rate_id: Set(line.vat_rate_id),
-                currency_amount: Set(None),
-                base_currency_amount: Set(None),
+                currency_amount: Set(currency_amount),
+                base_currency_amount: Set(base_currency_amount),
             };
 
             let created = JournalRepo::create_line(db, line_model)

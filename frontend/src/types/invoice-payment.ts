@@ -13,7 +13,9 @@ export interface InvoicePayment {
 export interface RecordPaymentData {
   amount: number;
   payment_date: string;
-  payment_account_id: string;
+  bank_account_id: string;
+  /** Required only when the bank account's currency differs from the invoice's. */
+  actual_base_amount?: number;
   payment_method?: string;
   reference?: string;
 }

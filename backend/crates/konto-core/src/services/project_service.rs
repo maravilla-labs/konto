@@ -3,6 +3,7 @@ use konto_common::error::AppError;
 use konto_common::enums::{InvoiceStatus, ProjectStatus as ProjectStatusEnum};
 use konto_db::entities::{project, time_entry, invoice, document};
 use konto_db::repository::contact_repo::ContactRepo;
+use konto_db::repository::currency_repo::CurrencyRepo;
 use konto_db::repository::project_repo::ProjectRepo;
 use rust_decimal::Decimal;
 use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter, Set};
@@ -121,13 +122,20 @@ impl ProjectService {
         hard_budget_amount: Option<Decimal>,
         contact_person_id: Option<String>,
         invoicing_method: Option<String>,
-        currency: Option<String>,
+        currency_id: Option<String>,
         rounding_method: Option<String>,
         rounding_factor_minutes: Option<i32>,
         flat_rate_total: Option<Decimal>,
         owner_id: Option<String>,
     ) -> Result<project::Model, AppError> {
         let now = Utc::now().naive_utc();
+        let resolved_currency_id = match currency_id {
+            Some(cid) => Some(cid),
+            None => CurrencyRepo::find_primary(db)
+                .await
+                .map_err(|e| AppError::Database(e.to_string()))?
+                .map(|c| c.id),
+        };
         let resolved_language = if let Some(lang) = normalize_language(language.as_deref()) {
             Some(lang)
         } else if let Some(ref cid) = contact_id {
@@ -167,7 +175,7 @@ impl ProjectService {
             hard_budget_amount: Set(hard_budget_amount),
             contact_person_id: Set(contact_person_id),
             invoicing_method: Set(invoicing_method.unwrap_or_else(|| "hourly".to_string())),
-            currency: Set(currency.unwrap_or_else(|| "CHF".to_string())),
+            currency_id: Set(resolved_currency_id),
             rounding_method: Set(rounding_method),
             rounding_factor_minutes: Set(rounding_factor_minutes),
             flat_rate_total: Set(flat_rate_total),
@@ -251,7 +259,7 @@ impl ProjectService {
         hard_budget_amount: Option<Option<Decimal>>,
         contact_person_id: Option<Option<String>>,
         invoicing_method: Option<String>,
-        currency: Option<String>,
+        currency_id: Option<String>,
         rounding_method: Option<Option<String>>,
         rounding_factor_minutes: Option<Option<i32>>,
         flat_rate_total: Option<Option<Decimal>>,
@@ -280,7 +288,7 @@ impl ProjectService {
         if let Some(hba) = hard_budget_amount { model.hard_budget_amount = Set(hba); }
         if let Some(cpid) = contact_person_id { model.contact_person_id = Set(cpid); }
         if let Some(im) = invoicing_method { model.invoicing_method = Set(im); }
-        if let Some(c) = currency { model.currency = Set(c); }
+        if let Some(cid) = currency_id { model.currency_id = Set(Some(cid)); }
         if let Some(rm) = rounding_method { model.rounding_method = Set(rm); }
         if let Some(rf) = rounding_factor_minutes { model.rounding_factor_minutes = Set(rf); }
         if let Some(frt) = flat_rate_total { model.flat_rate_total = Set(frt); }

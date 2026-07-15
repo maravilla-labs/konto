@@ -11,7 +11,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { useCurrencies, useCreateCurrency, useUpdateCurrency } from '@/hooks/useApi';
+import { useBankAccounts } from '@/hooks/useSettingsApi';
 import { toast } from 'sonner';
 import { Plus, Pencil } from 'lucide-react';
 import { useI18n } from '@/i18n';
@@ -21,6 +25,7 @@ import type { Currency } from '@/types/currency';
 export function CurrenciesPage() {
   const { t } = useI18n();
   const { data: currencies, isLoading } = useCurrencies();
+  const { data: bankAccounts } = useBankAccounts();
   const createCurrency = useCreateCurrency();
   const updateCurrency = useUpdateCurrency();
 
@@ -53,7 +58,18 @@ export function CurrenciesPage() {
     );
   }
 
+  function handleSetDefaultBankAccount(c: Currency, bankAccountId: string | null) {
+    updateCurrency.mutate(
+      { id: c.id, data: { code: c.code, name: c.name, symbol: c.symbol, default_bank_account_id: bankAccountId } },
+      {
+        onSuccess: () => toast.success(t('currencies.default_account_updated', 'Default bank account updated')),
+        onError: () => toast.error(t('currencies.default_account_failed', 'Failed to update default bank account')),
+      },
+    );
+  }
+
   const list = currencies ?? [];
+  const accounts = bankAccounts ?? [];
 
   return (
     <div className="space-y-4">
@@ -78,6 +94,7 @@ export function CurrenciesPage() {
                   <TableHead>Code</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Symbol</TableHead>
+                  <TableHead>{t('currencies.default_account', 'Default bank account')}</TableHead>
                   <TableHead>Primary</TableHead>
                   <TableHead className="w-16">Edit</TableHead>
                 </TableRow>
@@ -88,6 +105,24 @@ export function CurrenciesPage() {
                     <TableCell className="font-mono font-medium">{c.code}</TableCell>
                     <TableCell>{c.name}</TableCell>
                     <TableCell className="font-mono">{c.symbol}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={c.default_bank_account_id ?? '__none__'}
+                        onValueChange={(v) => handleSetDefaultBankAccount(c, v === '__none__' ? null : v)}
+                      >
+                        <SelectTrigger className="h-8 w-52">
+                          <SelectValue placeholder={t('currencies.default_account_none', 'None')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none__">{t('currencies.default_account_none', 'None')}</SelectItem>
+                          {accounts
+                            .filter((a) => a.currency_id === c.id)
+                            .map((a) => (
+                              <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
                     <TableCell>
                       {c.is_primary && <Badge variant="default">Primary</Badge>}
                     </TableCell>

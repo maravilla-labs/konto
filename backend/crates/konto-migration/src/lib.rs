@@ -86,6 +86,10 @@ mod m20240101_000085_alter_employees_number;
 mod m20240101_000086_alter_projects_owner_and_users_employee;
 mod m20240101_000087_backfill_contact_customer_number;
 mod m20240101_000088_html_to_markdown;
+mod m20240101_000089_alter_projects_currency_fk;
+mod m20240101_000090_alter_currencies_default_bank_account;
+mod m20240101_000091_seed_fx_default_accounts;
+mod m20240101_000092_create_currency_exchanges;
 
 pub struct Migrator;
 
@@ -179,6 +183,10 @@ impl MigratorTrait for Migrator {
             Box::new(m20240101_000086_alter_projects_owner_and_users_employee::Migration),
             Box::new(m20240101_000087_backfill_contact_customer_number::Migration),
             Box::new(m20240101_000088_html_to_markdown::Migration),
+            Box::new(m20240101_000089_alter_projects_currency_fk::Migration),
+            Box::new(m20240101_000090_alter_currencies_default_bank_account::Migration),
+            Box::new(m20240101_000091_seed_fx_default_accounts::Migration),
+            Box::new(m20240101_000092_create_currency_exchanges::Migration),
         ]
     }
 }

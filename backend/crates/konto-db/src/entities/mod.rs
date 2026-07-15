@@ -58,3 +58,4 @@ pub mod payroll_run;
 pub mod payroll_run_line;
 pub mod payout_entry;
 pub mod project_sub_status;
+pub mod currency_exchange;

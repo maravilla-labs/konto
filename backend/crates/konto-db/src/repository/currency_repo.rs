@@ -19,6 +19,15 @@ impl CurrencyRepo {
         CurrencyEntity::find_by_id(id).one(db).await
     }
 
+    pub async fn find_primary(
+        db: &DatabaseConnection,
+    ) -> Result<Option<currency::Model>, DbErr> {
+        CurrencyEntity::find()
+            .filter(currency::Column::IsPrimary.eq(true))
+            .one(db)
+            .await
+    }
+
     pub async fn create(
         db: &DatabaseConnection,
         model: currency::ActiveModel,

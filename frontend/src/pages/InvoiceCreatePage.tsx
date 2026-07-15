@@ -44,6 +44,7 @@ export function InvoiceCreatePage() {
     default_vat_rate_id: '',
     default_account_id: '',
     bank_account_id: '',
+    currency_id: '',
     lines: [emptyLine()],
   });
 
@@ -54,6 +55,7 @@ export function InvoiceCreatePage() {
       issue_date: form.issue_date,
       due_date: form.due_date,
       language: form.language || undefined,
+      currency_id: form.currency_id || undefined,
       notes: form.notes || undefined,
       payment_terms: form.payment_terms || undefined,
       header_text: form.header_text || undefined,

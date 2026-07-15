@@ -29,7 +29,7 @@ pub struct ProjectResponse {
     pub hard_budget_amount: Option<rust_decimal::Decimal>,
     pub contact_person_id: Option<String>,
     pub invoicing_method: String,
-    pub currency: String,
+    pub currency_id: Option<String>,
     pub rounding_method: Option<String>,
     pub rounding_factor_minutes: Option<i32>,
     #[schema(value_type = Option<String>)]
@@ -79,7 +79,7 @@ pub struct CreateProjectRequest {
     pub contact_person_id: Option<String>,
     pub owner_id: Option<String>,
     pub invoicing_method: Option<String>,
-    pub currency: Option<String>,
+    pub currency_id: Option<String>,
     pub rounding_method: Option<String>,
     pub rounding_factor_minutes: Option<i32>,
     #[schema(value_type = Option<String>)]
@@ -112,7 +112,7 @@ pub struct UpdateProjectRequest {
     pub hard_budget_amount: Option<Option<rust_decimal::Decimal>>,
     pub contact_person_id: Option<Option<String>>,
     pub invoicing_method: Option<String>,
-    pub currency: Option<String>,
+    pub currency_id: Option<String>,
     pub rounding_method: Option<Option<String>>,
     pub rounding_factor_minutes: Option<Option<i32>>,
     #[schema(value_type = Option<Option<String>>)]
@@ -143,7 +143,7 @@ impl From<konto_db::entities::project::Model> for ProjectResponse {
             hard_budget_amount: m.hard_budget_amount,
             contact_person_id: m.contact_person_id,
             invoicing_method: m.invoicing_method,
-            currency: m.currency,
+            currency_id: m.currency_id,
             rounding_method: m.rounding_method,
             rounding_factor_minutes: m.rounding_factor_minutes,
             flat_rate_total: m.flat_rate_total,

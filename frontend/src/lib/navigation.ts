@@ -101,6 +101,7 @@ export const navItems: NavItem[] = [
   { id: 'settings-vat-rates', label: 'VAT Rates', category: 'Settings', path: '/settings/vat-rates', icon: Receipt, keywords: ['mwst', 'steuersatz', 'vat rate'], roles: ['admin'], showInSidebar: false },
   { id: 'settings-currencies', label: 'Currencies', category: 'Settings', path: '/settings/currencies', icon: Banknote, keywords: ['währung', 'currency', 'chf', 'eur'], roles: ['admin'], showInSidebar: false },
   { id: 'settings-exchange-rates', label: 'Exchange Rates', category: 'Settings', path: '/settings/exchange-rates', icon: ArrowLeftRight, keywords: ['wechselkurs', 'exchange', 'kurs'], roles: ['admin'], showInSidebar: false },
+  { id: 'settings-currency-exchanges', label: 'Currency Exchanges', category: 'Settings', path: '/settings/currency-exchanges', icon: RefreshCw, keywords: ['transfer', 'kursgewinn', 'kursverlust', 'fx'], roles: ['admin'], showInSidebar: false },
   { id: 'settings-default-accounts', label: 'Default Accounts', category: 'Settings', path: '/settings/default-accounts', icon: BookOpen, keywords: ['standardkonten', 'default'], roles: ['admin'], showInSidebar: false },
   { id: 'settings-templates', label: 'Templates', category: 'Settings', path: '/settings/templates', icon: FileStack, keywords: ['vorlage', 'template'], roles: ['admin'], showInSidebar: false },
   { id: 'settings-letterhead', label: 'Letterhead', category: 'Settings', path: '/settings/letterhead', icon: FileText, keywords: ['briefkopf', 'letterhead'], roles: ['admin'], showInSidebar: false },

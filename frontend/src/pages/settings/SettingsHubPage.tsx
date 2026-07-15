@@ -31,6 +31,7 @@ const sections: SettingsSection[] = [
       { label: 'Fiscal Years', path: '/settings/fiscal-years' },
       { label: 'Currencies', path: '/settings/currencies' },
       { label: 'Exchange Rates', path: '/settings/exchange-rates' },
+      { label: 'Currency Exchanges', path: '/settings/currency-exchanges' },
       { label: 'Employees', path: '/settings/employees' },
     ],
   },

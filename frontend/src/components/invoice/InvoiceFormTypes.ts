@@ -15,6 +15,7 @@ export interface InvoiceFormData {
   default_vat_rate_id: string;
   default_account_id: string;
   bank_account_id: string;
+  currency_id: string;
   lines: LineFormData[];
 }
 

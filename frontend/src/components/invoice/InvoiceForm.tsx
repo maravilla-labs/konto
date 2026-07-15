@@ -15,7 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useAccounts,
   useContacts,
+  useCurrencies,
   useDefaultAccounts,
+  useLatestExchangeRate,
   useProjects,
   useVatRates,
   useContactVatInfo,
@@ -62,10 +64,20 @@ export function InvoiceForm({
   const { data: defaultAccountsData } = useDefaultAccounts();
   const { data: vatInfoData } = useContactVatInfo(form.contact_id || undefined);
   const { data: bankAccountsData } = useBankAccounts();
+  const { data: currenciesData } = useCurrencies();
 
   const contacts = contactsData?.data ?? [];
   const allProjects = projectsData?.data ?? [];
   const bankAccounts = bankAccountsData ?? [];
+  const currencies = currenciesData ?? [];
+  const primaryCurrency = currencies.find((c) => c.is_primary);
+  const effectiveCurrencyId = form.currency_id || primaryCurrency?.id || '';
+  const isForeignCurrency = !!primaryCurrency && effectiveCurrencyId !== primaryCurrency.id;
+  const { data: latestRate } = useLatestExchangeRate(
+    isForeignCurrency ? effectiveCurrencyId : undefined,
+    isForeignCurrency ? primaryCurrency?.id : undefined,
+    form.issue_date || undefined,
+  );
   const projects = form.contact_id
     ? allProjects.filter((p) => p.contact_id === form.contact_id || !p.contact_id)
     : allProjects;
@@ -143,7 +155,20 @@ export function InvoiceForm({
       contact_id: project.contact_id ?? form.contact_id,
       contact_person_id: project.contact_person_id ?? form.contact_person_id,
       language: project.language ?? form.language,
+      // Only adopt the project's currency if the invoice hasn't been given one yet.
+      currency_id: form.currency_id || project.currency_id || '',
     });
+  }
+
+  function handleCurrencyChange(currencyId: string) {
+    const currency = currencies.find((c) => c.id === currencyId);
+    // Auto-switch to that currency's default bank account, but only while the
+    // form is still on the system default (bank_account_id empty) — an
+    // explicit user choice of bank account is never overridden.
+    const nextBankAccountId = !form.bank_account_id && currency?.default_bank_account_id
+      ? currency.default_bank_account_id
+      : form.bank_account_id;
+    setForm({ ...form, currency_id: currencyId, bank_account_id: nextBankAccountId });
   }
 
   function handleContactChange(contactId: string, personContactId?: string) {
@@ -355,6 +380,39 @@ export function InvoiceForm({
                   </Select>
                 </div>
               </div>
+              {currencies.length > 0 && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label>{t('invoice_form.currency', 'Currency')}</Label>
+                    <Select
+                      value={effectiveCurrencyId || '__none__'}
+                      onValueChange={(v) => handleCurrencyChange(v === '__none__' ? '' : v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {currencies.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.code} — {c.name}{c.is_primary ? ` (${t('common.default', 'Default')})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {isForeignCurrency && (
+                    <div className="flex items-end pb-1">
+                      <div className="rounded-md border px-3 py-2 text-sm text-muted-foreground">
+                        {latestRate
+                          ? t('invoice_form.rate_preview', 'Booking rate: {rate} (as of {date}) — manage in Settings › Exchange Rates')
+                              .replace('{rate}', latestRate.rate)
+                              .replace('{date}', latestRate.valid_date)
+                          : t('invoice_form.rate_missing', 'No exchange rate found for this currency — add one in Settings › Exchange Rates before sending')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               {bankAccounts.length > 0 && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>

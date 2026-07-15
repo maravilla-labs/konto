@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { useUpdateProject, useProjectSubStatuses, useContacts } from '@/hooks/useApi';
+import { useUpdateProject, useProjectSubStatuses, useContacts, useCurrencies } from '@/hooks/useApi';
 import { useI18n } from '@/i18n';
 import { toast } from 'sonner';
 import type { ProjectSummary } from '@/types/projects';
@@ -22,11 +22,12 @@ export function ProjectSettingsTab({ projectId, summary }: ProjectSettingsTabPro
   const { data: subStatuses } = useProjectSubStatuses();
   const { data: contactsData } = useContacts({ per_page: 200 });
   const contacts = contactsData?.data ?? [];
+  const { data: currencies } = useCurrencies();
 
   const [form, setForm] = useState({
     contact_id: '',
     invoicing_method: 'hourly',
-    currency: 'CHF',
+    currency_id: '',
     rounding_method: '',
     rounding_factor_minutes: '',
     flat_rate_total: '',
@@ -42,7 +43,7 @@ export function ProjectSettingsTab({ projectId, summary }: ProjectSettingsTabPro
     setForm({
       contact_id: summary.contact_id ?? '',
       invoicing_method: summary.invoicing_method ?? 'hourly',
-      currency: summary.currency ?? 'CHF',
+      currency_id: summary.currency_id ?? '',
       rounding_method: summary.rounding_method ?? '',
       rounding_factor_minutes: summary.rounding_factor_minutes?.toString() ?? '',
       flat_rate_total: summary.flat_rate_total?.toString() ?? '',
@@ -62,7 +63,7 @@ export function ProjectSettingsTab({ projectId, summary }: ProjectSettingsTabPro
         data: {
           contact_id: form.contact_id || undefined,
           invoicing_method: form.invoicing_method || undefined,
-          currency: form.currency || undefined,
+          currency_id: form.currency_id || undefined,
           rounding_method: form.rounding_method || null,
           rounding_factor_minutes: form.rounding_factor_minutes ? Number(form.rounding_factor_minutes) : null,
           flat_rate_total: form.flat_rate_total ? Number(form.flat_rate_total) : null,
@@ -126,7 +127,18 @@ export function ProjectSettingsTab({ projectId, summary }: ProjectSettingsTabPro
             </div>
             <div>
               <Label>{t('project_conditions.currency', 'Currency')}</Label>
-              <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="CHF" />
+              <Select
+                value={form.currency_id || '__none__'}
+                onValueChange={(v) => setForm({ ...form, currency_id: v === '__none__' ? '' : v })}
+              >
+                <SelectTrigger><SelectValue placeholder={t('common.none', 'None')} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">{t('common.none', 'None')}</SelectItem>
+                  {(currencies ?? []).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

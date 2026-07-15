@@ -20,7 +20,7 @@ export interface Project {
   soft_budget_amount?: number;
   hard_budget_amount?: number;
   invoicing_method: string;
-  currency: string;
+  currency_id: string | null;
   rounding_method: string | null;
   rounding_factor_minutes: number | null;
   flat_rate_total: number | null;
@@ -53,7 +53,7 @@ export interface CreateProject {
   soft_budget_amount?: number;
   hard_budget_amount?: number;
   invoicing_method?: string;
-  currency?: string;
+  currency_id?: string | null;
   rounding_method?: string | null;
   rounding_factor_minutes?: number | null;
   flat_rate_total?: number | null;

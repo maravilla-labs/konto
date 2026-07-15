@@ -82,3 +82,5 @@ pub mod project_budget_service;
 pub mod project_sub_status_service;
 pub mod setup_service;
 pub mod vat_resolution_service;
+pub mod currency_exchange_service;
+pub mod ecb_rate_service;

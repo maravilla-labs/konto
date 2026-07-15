@@ -30,10 +30,15 @@ impl ExchangeRateRepo {
         db: &DatabaseConnection,
         from_currency_id: &str,
         to_currency_id: &str,
+        as_of_date: Option<chrono::NaiveDate>,
     ) -> Result<Option<exchange_rate::Model>, DbErr> {
-        ExchangeRateEntity::find()
+        let mut query = ExchangeRateEntity::find()
             .filter(exchange_rate::Column::FromCurrencyId.eq(from_currency_id))
-            .filter(exchange_rate::Column::ToCurrencyId.eq(to_currency_id))
+            .filter(exchange_rate::Column::ToCurrencyId.eq(to_currency_id));
+        if let Some(date) = as_of_date {
+            query = query.filter(exchange_rate::Column::ValidDate.lte(date));
+        }
+        query
             .order_by_desc(exchange_rate::Column::ValidDate)
             .one(db)
             .await

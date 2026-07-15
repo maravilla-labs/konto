@@ -23,6 +23,7 @@ import { AccountLedgerPage } from '@/pages/AccountLedgerPage';
 import { VatReportPage } from '@/pages/VatReportPage';
 import { FiscalYearsPage } from '@/pages/FiscalYearsPage';
 import { ExchangeRatesPage } from '@/pages/ExchangeRatesPage';
+import { CurrencyExchangesPage } from '@/pages/CurrencyExchangesPage';
 import { InvoicesPage } from '@/pages/InvoicesPage';
 import { InvoiceCreatePage } from '@/pages/InvoiceCreatePage';
 import { InvoiceDetailPage } from '@/pages/InvoiceDetailPage';
@@ -184,6 +185,7 @@ function AppRoutes() {
           <Route path="/settings/letterhead" element={<RoleGuard roles={['admin']}><LetterheadPage /></RoleGuard>} />
           <Route path="/settings/fiscal-years" element={<RoleGuard roles={['admin']}><FiscalYearsPage /></RoleGuard>} />
           <Route path="/settings/exchange-rates" element={<RoleGuard roles={['admin']}><ExchangeRatesPage /></RoleGuard>} />
+          <Route path="/settings/currency-exchanges" element={<RoleGuard roles={['admin']}><CurrencyExchangesPage /></RoleGuard>} />
           <Route path="/settings/users" element={<RoleGuard roles={['admin']}><UsersPage /></RoleGuard>} />
           <Route path="/settings/email" element={<RoleGuard roles={['admin']}><EmailSettingsPage /></RoleGuard>} />
           <Route path="/settings/email-templates" element={<RoleGuard roles={['admin']}><EmailTemplatesPage /></RoleGuard>} />

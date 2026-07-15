@@ -6,6 +6,7 @@ import { projectsApi } from '@/api/projects';
 import { importsApi } from '@/api/imports';
 import { fiscalYearsApi } from '@/api/fiscal-years';
 import { exchangeRatesApi } from '@/api/exchange-rates';
+import { currencyExchangesApi } from '@/api/currency-exchanges';
 import { reportsApi, type TrialBalanceParams, type DateRangeParams, type AccountLedgerParams } from '@/api/reports';
 import { dashboardApi } from '@/api/dashboard';
 import { timeEntriesApi, type CreateTimeEntry, type UpdateTimeEntry } from '@/api/time-entries';
@@ -17,6 +18,7 @@ import type { CreateProject, UpdateProject } from '@/types/projects';
 import type { ImportType } from '@/types/imports';
 import type { CreateFiscalYear } from '@/types/fiscal-year';
 import type { CreateExchangeRate } from '@/types/exchange-rate';
+import type { RecordTransfer } from '@/types/currency-exchange';
 import { invoicesApi } from '@/api/invoices';
 import type { CreateInvoice, UpdateInvoice, PayInvoiceData, InvoiceListParams } from '@/types/invoice';
 import { usersApi } from '@/api/users';
@@ -323,6 +325,43 @@ export function useDeleteExchangeRate() {
   return useMutation({
     mutationFn: (id: string) => exchangeRatesApi.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['exchange-rates'] }),
+  });
+}
+
+/** Latest applicable rate for a currency pair as of a given date; disabled until both currencies differ and are known. */
+export function useLatestExchangeRate(fromCurrencyId?: string, toCurrencyId?: string, asOfDate?: string) {
+  return useQuery({
+    queryKey: ['exchange-rates', 'latest', fromCurrencyId, toCurrencyId, asOfDate],
+    queryFn: () => exchangeRatesApi.getLatest(fromCurrencyId!, toCurrencyId!, asOfDate).then((r) => r.data),
+    enabled: !!fromCurrencyId && !!toCurrencyId && fromCurrencyId !== toCurrencyId,
+    retry: false,
+  });
+}
+
+export function useFetchLatestRatesFromEcb() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => exchangeRatesApi.fetchLatestFromEcb(),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['exchange-rates'] }),
+  });
+}
+
+// Currency Exchanges (inter-account transfers, realized FX gain/loss)
+export function useCurrencyExchanges(params?: ListParams) {
+  return useQuery({
+    queryKey: ['currency-exchanges', params],
+    queryFn: () => currencyExchangesApi.list(params).then((r) => r.data),
+  });
+}
+
+export function useRecordTransfer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: RecordTransfer) => currencyExchangesApi.create(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['currency-exchanges'] });
+      qc.invalidateQueries({ queryKey: ['journal'] });
+    },
   });
 }
 

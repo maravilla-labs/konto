@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import {
   useInvoice, useSendInvoice, usePayInvoice, useCancelInvoice,
-  useDeleteInvoice, useAccounts, useInvoiceDunning, useDunningLevels,
+  useDeleteInvoice, useInvoiceDunning, useDunningLevels,
   useSendReminder, useInvoicePayments, useRecordPayment,
 } from '@/hooks/useApi';
 import { formatAmount } from '@/lib/format';
@@ -24,7 +24,7 @@ import { ReminderDialog, MarkPaidDialog, RecordPaymentDialog } from '@/component
 import { PdfPreviewDialog } from '@/components/invoice/PdfPreviewDialog';
 import { saveFile } from '@/lib/native';
 import { useI18n } from '@/i18n';
-import { useSettings } from '@/hooks/useSettingsApi';
+import { useSettings, useBankAccounts } from '@/hooks/useSettingsApi';
 import { formatDate } from '@/lib/locale';
 import {
   Pencil, Send, CreditCard, XCircle, Trash2, Download, Mail,
@@ -57,19 +57,18 @@ export function InvoiceDetailPage() {
   const [reminderLevelId, setReminderLevelId] = useState('');
   const [payOpen, setPayOpen] = useState(false);
   const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
-  const [payAccountId, setPayAccountId] = useState('');
+  const [payBankAccountId, setPayBankAccountId] = useState('');
+  const [payActualBaseAmount, setPayActualBaseAmount] = useState('');
   const [recordOpen, setRecordOpen] = useState(false);
   const [recordForm, setRecordForm] = useState({
     amount: '', payment_date: new Date().toISOString().split('T')[0],
-    payment_account_id: '', payment_method: '', reference: '',
+    bank_account_id: '', actual_base_amount: '', payment_method: '', reference: '',
   });
   const [pdfOpen, setPdfOpen] = useState(false);
   const [savingPdf, setSavingPdf] = useState(false);
 
-  const { data: accountsData } = useAccounts({ per_page: 500 });
-  const bankAccounts = (accountsData?.data ?? []).filter(
-    (a) => a.account_type === 'asset' && a.number >= 1000 && a.number <= 1099,
-  );
+  const { data: bankAccountsData } = useBankAccounts();
+  const bankAccounts = bankAccountsData ?? [];
 
   const totalPaid = (payments ?? []).reduce((sum, p) => sum + parseFloat(p.amount), 0);
   const invoiceTotal = data ? parseFloat(data.total) : 0;
@@ -103,7 +102,14 @@ export function InvoiceDetailPage() {
 
   function handlePay() {
     payInvoice.mutate(
-      { id: id!, data: { payment_date: payDate, payment_account_id: payAccountId } },
+      {
+        id: id!,
+        data: {
+          payment_date: payDate,
+          bank_account_id: payBankAccountId,
+          actual_base_amount: payActualBaseAmount ? parseFloat(payActualBaseAmount) : undefined,
+        },
+      },
       {
         onSuccess: () => { toast.success(t('invoices.marked_paid', 'Invoice marked as paid')); setPayOpen(false); },
         onError: (err) => toast.error(extractErrorMessage(err)),
@@ -138,7 +144,7 @@ export function InvoiceDetailPage() {
 
   function handleRecordPayment() {
     const amount = parseFloat(recordForm.amount);
-    if (!amount || amount <= 0 || !recordForm.payment_account_id) {
+    if (!amount || amount <= 0 || !recordForm.bank_account_id) {
       toast.error(t('invoice_dialogs.amount_and_account_required', 'Amount and payment account are required'));
       return;
     }
@@ -148,7 +154,8 @@ export function InvoiceDetailPage() {
         data: {
           amount,
           payment_date: recordForm.payment_date,
-          payment_account_id: recordForm.payment_account_id,
+          bank_account_id: recordForm.bank_account_id,
+          actual_base_amount: recordForm.actual_base_amount ? parseFloat(recordForm.actual_base_amount) : undefined,
           payment_method: recordForm.payment_method || undefined,
           reference: recordForm.reference || undefined,
         },
@@ -157,7 +164,7 @@ export function InvoiceDetailPage() {
         onSuccess: () => {
           toast.success(t('invoice_dialogs.recorded', 'Payment recorded'));
           setRecordOpen(false);
-          setRecordForm({ amount: '', payment_date: new Date().toISOString().split('T')[0], payment_account_id: '', payment_method: '', reference: '' });
+          setRecordForm({ amount: '', payment_date: new Date().toISOString().split('T')[0], bank_account_id: '', actual_base_amount: '', payment_method: '', reference: '' });
         },
         onError: (err) => toast.error(extractErrorMessage(err)),
       },
@@ -469,14 +476,17 @@ export function InvoiceDetailPage() {
       <MarkPaidDialog
         open={payOpen} onOpenChange={setPayOpen}
         date={payDate} onDateChange={setPayDate}
-        accountId={payAccountId} onAccountChange={setPayAccountId}
-        accounts={bankAccounts} onConfirm={handlePay}
+        bankAccountId={payBankAccountId} onBankAccountChange={setPayBankAccountId}
+        bankAccounts={bankAccounts} invoiceCurrencyId={data.currency_id}
+        actualBaseAmount={payActualBaseAmount} onActualBaseAmountChange={setPayActualBaseAmount}
+        onConfirm={handlePay}
         isPending={payInvoice.isPending}
       />
       <RecordPaymentDialog
         open={recordOpen} onOpenChange={setRecordOpen}
         form={recordForm} onFormChange={setRecordForm}
-        accounts={bankAccounts} invoiceTotal={data?.total ?? '0'}
+        bankAccounts={bankAccounts} invoiceCurrencyId={data.currency_id}
+        invoiceTotal={data?.total ?? '0'}
         remaining={remaining.toFixed(2)} onRecord={handleRecordPayment}
         isPending={recordPayment.isPending}
       />

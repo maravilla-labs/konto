@@ -123,7 +123,11 @@ impl InvoiceListParams {
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct PayInvoiceRequest {
     pub payment_date: String,
-    pub payment_account_id: String,
+    pub bank_account_id: String,
+    /// Required only when the bank account's currency differs from the invoice's —
+    /// the real base-currency amount that was received after conversion.
+    #[schema(value_type = Option<String>)]
+    pub actual_base_amount: Option<Decimal>,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]

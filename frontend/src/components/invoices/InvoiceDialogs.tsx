@@ -9,13 +9,8 @@ import {
 } from '@/components/ui/select';
 import { formatAmount } from '@/lib/format';
 import type { DunningLevel } from '@/types/dunning';
+import type { BankAccount } from '@/types/settings';
 import { useI18n } from '@/i18n';
-
-interface Account {
-  id: string;
-  number: number;
-  name: string;
-}
 
 interface ReminderDialogProps {
   open: boolean;
@@ -61,15 +56,23 @@ interface MarkPaidDialogProps {
   onOpenChange: (v: boolean) => void;
   date: string;
   onDateChange: (v: string) => void;
-  accountId: string;
-  onAccountChange: (v: string) => void;
-  accounts: Account[];
+  bankAccountId: string;
+  onBankAccountChange: (v: string) => void;
+  bankAccounts: BankAccount[];
+  invoiceCurrencyId: string | null;
+  actualBaseAmount: string;
+  onActualBaseAmountChange: (v: string) => void;
   onConfirm: () => void;
   isPending: boolean;
 }
 
-export function MarkPaidDialog({ open, onOpenChange, date, onDateChange, accountId, onAccountChange, accounts, onConfirm, isPending }: MarkPaidDialogProps) {
+export function MarkPaidDialog({
+  open, onOpenChange, date, onDateChange, bankAccountId, onBankAccountChange, bankAccounts,
+  invoiceCurrencyId, actualBaseAmount, onActualBaseAmountChange, onConfirm, isPending,
+}: MarkPaidDialogProps) {
   const { t } = useI18n();
+  const selectedAccount = bankAccounts.find((a) => a.id === bankAccountId);
+  const needsConversion = !!selectedAccount && selectedAccount.currency_id !== invoiceCurrencyId;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -81,16 +84,30 @@ export function MarkPaidDialog({ open, onOpenChange, date, onDateChange, account
           </div>
           <div>
             <Label>{t('invoice_dialogs.payment_account', 'Payment Account')}</Label>
-            <Select value={accountId} onValueChange={onAccountChange}>
+            <Select value={bankAccountId} onValueChange={onBankAccountChange}>
               <SelectTrigger><SelectValue placeholder={t('invoice_dialogs.select_bank_cash_account', 'Select bank/cash account')} /></SelectTrigger>
               <SelectContent>
-                {accounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>{a.number} — {a.name}</SelectItem>
+                {bankAccounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={onConfirm} className="w-full" disabled={isPending || !accountId}>
+          {needsConversion && (
+            <div>
+              <Label>{t('invoice_dialogs.actual_amount_received', 'Actual amount received (bank account currency)')}</Label>
+              <Input
+                type="number" step="0.01"
+                value={actualBaseAmount}
+                onChange={(e) => onActualBaseAmountChange(e.target.value)}
+                placeholder="0.00"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t('invoice_dialogs.actual_amount_hint', 'This bank account\'s currency differs from the invoice\'s — enter the real amount that landed in the account so the FX gain/loss is booked correctly.')}
+              </p>
+            </div>
+          )}
+          <Button onClick={onConfirm} className="w-full" disabled={isPending || !bankAccountId || (needsConversion && !actualBaseAmount)}>
             {t('invoice_dialogs.mark_paid.confirm', 'Confirm Payment')}
           </Button>
         </div>
@@ -102,7 +119,8 @@ export function MarkPaidDialog({ open, onOpenChange, date, onDateChange, account
 interface RecordPaymentForm {
   amount: string;
   payment_date: string;
-  payment_account_id: string;
+  bank_account_id: string;
+  actual_base_amount: string;
   payment_method: string;
   reference: string;
 }
@@ -112,15 +130,21 @@ interface RecordPaymentDialogProps {
   onOpenChange: (v: boolean) => void;
   form: RecordPaymentForm;
   onFormChange: (f: RecordPaymentForm) => void;
-  accounts: Account[];
+  bankAccounts: BankAccount[];
+  invoiceCurrencyId: string | null;
   invoiceTotal: string;
   remaining: string;
   onRecord: () => void;
   isPending: boolean;
 }
 
-export function RecordPaymentDialog({ open, onOpenChange, form, onFormChange, accounts, invoiceTotal, remaining, onRecord, isPending }: RecordPaymentDialogProps) {
+export function RecordPaymentDialog({
+  open, onOpenChange, form, onFormChange, bankAccounts, invoiceCurrencyId,
+  invoiceTotal, remaining, onRecord, isPending,
+}: RecordPaymentDialogProps) {
   const { t } = useI18n();
+  const selectedAccount = bankAccounts.find((a) => a.id === form.bank_account_id);
+  const needsConversion = !!selectedAccount && selectedAccount.currency_id !== invoiceCurrencyId;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -130,7 +154,7 @@ export function RecordPaymentDialog({ open, onOpenChange, form, onFormChange, ac
             {t('invoice_dialogs.invoice_total', 'Invoice total')}: {formatAmount(invoiceTotal)} - {t('invoice_dialogs.remaining', 'Remaining')}: {formatAmount(remaining)}
           </p>
           <div>
-            <Label>{t('invoice_dialogs.amount_chf', 'Amount (CHF)')}</Label>
+            <Label>{t('invoice_dialogs.amount_chf', 'Amount (invoice currency)')}</Label>
             <Input type="number" step="0.01" value={form.amount} onChange={(e) => onFormChange({ ...form, amount: e.target.value })} placeholder="0.00" />
           </div>
           <div>
@@ -139,15 +163,29 @@ export function RecordPaymentDialog({ open, onOpenChange, form, onFormChange, ac
           </div>
           <div>
             <Label>{t('invoice_dialogs.payment_account', 'Payment Account')}</Label>
-            <Select value={form.payment_account_id} onValueChange={(v) => onFormChange({ ...form, payment_account_id: v })}>
+            <Select value={form.bank_account_id} onValueChange={(v) => onFormChange({ ...form, bank_account_id: v })}>
               <SelectTrigger><SelectValue placeholder={t('invoice_dialogs.select_bank_cash_account', 'Select bank/cash account')} /></SelectTrigger>
               <SelectContent>
-                {accounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>{a.number} — {a.name}</SelectItem>
+                {bankAccounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+          {needsConversion && (
+            <div>
+              <Label>{t('invoice_dialogs.actual_amount_received', 'Actual amount received (bank account currency)')}</Label>
+              <Input
+                type="number" step="0.01"
+                value={form.actual_base_amount}
+                onChange={(e) => onFormChange({ ...form, actual_base_amount: e.target.value })}
+                placeholder="0.00"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t('invoice_dialogs.actual_amount_hint', 'This bank account\'s currency differs from the invoice\'s — enter the real amount that landed in the account so the FX gain/loss is booked correctly.')}
+              </p>
+            </div>
+          )}
           <div>
             <Label>{t('invoice_dialogs.payment_method_optional', 'Payment Method (optional)')}</Label>
             <Input value={form.payment_method} onChange={(e) => onFormChange({ ...form, payment_method: e.target.value })} placeholder={t('invoice_dialogs.payment_method_placeholder', 'e.g. Bank Transfer, Cash')} />
@@ -156,7 +194,10 @@ export function RecordPaymentDialog({ open, onOpenChange, form, onFormChange, ac
             <Label>{t('invoice_dialogs.reference_optional', 'Reference (optional)')}</Label>
             <Input value={form.reference} onChange={(e) => onFormChange({ ...form, reference: e.target.value })} placeholder={t('invoice_dialogs.reference_placeholder', 'e.g. Transaction ID')} />
           </div>
-          <Button onClick={onRecord} className="w-full" disabled={isPending || !form.amount || !form.payment_account_id}>
+          <Button
+            onClick={onRecord} className="w-full"
+            disabled={isPending || !form.amount || !form.bank_account_id || (needsConversion && !form.actual_base_amount)}
+          >
             {t('invoice_dialogs.record.action', 'Record Payment')}
           </Button>
         </div>

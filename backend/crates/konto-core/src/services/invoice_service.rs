@@ -318,10 +318,11 @@ impl InvoiceService {
         db: &DatabaseConnection,
         id: &str,
         payment_date: chrono::NaiveDate,
-        payment_account_id: &str,
+        bank_account_id: &str,
+        actual_base_amount: Option<Decimal>,
         user_id: &str,
     ) -> Result<invoice::Model, AppError> {
-        invoice_workflow::mark_paid(db, id, payment_date, payment_account_id, user_id).await
+        invoice_workflow::mark_paid(db, id, payment_date, bank_account_id, actual_base_amount, user_id).await
     }
 
     pub async fn cancel_invoice(
@@ -338,14 +339,15 @@ impl InvoiceService {
         invoice_id: &str,
         amount: Decimal,
         payment_date: chrono::NaiveDate,
-        payment_account_id: &str,
+        bank_account_id: &str,
+        actual_base_amount: Option<Decimal>,
         payment_method: Option<String>,
         reference: Option<String>,
         user_id: &str,
     ) -> Result<konto_db::entities::invoice_payment::Model, AppError> {
         invoice_workflow::record_payment(
             db, invoice_id, amount, payment_date,
-            payment_account_id, payment_method, reference, user_id,
+            bank_account_id, actual_base_amount, payment_method, reference, user_id,
         ).await
     }
 

@@ -21,11 +21,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
   useBankAccounts,
   useCreateBankAccount,
   useUpdateBankAccount,
   useDeleteBankAccount,
 } from '@/hooks/useSettingsApi';
+import { useCurrencies } from '@/hooks/useApi';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, QrCode } from 'lucide-react';
 import { useI18n } from '@/i18n';
@@ -43,6 +47,7 @@ const emptyForm: CreateBankAccount = {
 export function BankAccountsPage() {
   const { t } = useI18n();
   const { data, isLoading } = useBankAccounts();
+  const { data: currencies } = useCurrencies();
   const createAccount = useCreateBankAccount();
   const updateAccount = useUpdateBankAccount();
   const deleteAccount = useDeleteBankAccount();
@@ -188,6 +193,21 @@ export function BankAccountsPage() {
             <div>
               <Label>BIC/SWIFT</Label>
               <Input value={form.bic ?? ''} onChange={(e) => setForm({ ...form, bic: e.target.value })} placeholder="Optional" />
+            </div>
+            <div>
+              <Label>{t('bank_accounts.currency', 'Currency')}</Label>
+              <Select
+                value={form.currency_id ?? '__none__'}
+                onValueChange={(v) => setForm({ ...form, currency_id: v === '__none__' ? null : v })}
+              >
+                <SelectTrigger><SelectValue placeholder={t('bank_accounts.currency_none', 'No currency')} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">{t('bank_accounts.currency_none', 'No currency')}</SelectItem>
+                  {(currencies ?? []).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label className="flex items-center gap-1.5">

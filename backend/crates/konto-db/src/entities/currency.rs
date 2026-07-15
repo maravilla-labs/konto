@@ -11,9 +11,23 @@ pub struct Model {
     pub name: String,
     pub symbol: String,
     pub is_primary: bool,
+    pub default_bank_account_id: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::bank_account::Entity",
+        from = "Column::DefaultBankAccountId",
+        to = "super::bank_account::Column::Id"
+    )]
+    BankAccount,
+}
+
+impl Related<super::bank_account::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::BankAccount.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

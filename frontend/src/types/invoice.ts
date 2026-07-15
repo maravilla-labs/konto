@@ -76,7 +76,9 @@ export type UpdateInvoice = CreateInvoice;
 
 export interface PayInvoiceData {
   payment_date: string;
-  payment_account_id: string;
+  bank_account_id: string;
+  /** Required only when the bank account's currency differs from the invoice's. */
+  actual_base_amount?: number;
 }
 
 export interface InvoiceListParams {

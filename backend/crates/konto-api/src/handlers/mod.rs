@@ -2,6 +2,7 @@ pub mod auth_handler;
 pub mod account_handler;
 pub mod contact_handler;
 pub mod exchange_rate_handler;
+pub mod currency_exchange_handler;
 pub mod fiscal_year_handler;
 pub mod journal_handler;
 pub mod project_handler;

@@ -33,8 +33,9 @@ impl ExchangeRateService {
         db: &DatabaseConnection,
         from_currency_id: &str,
         to_currency_id: &str,
+        as_of_date: Option<NaiveDate>,
     ) -> Result<exchange_rate::Model, AppError> {
-        ExchangeRateRepo::find_latest(db, from_currency_id, to_currency_id)
+        ExchangeRateRepo::find_latest(db, from_currency_id, to_currency_id, as_of_date)
             .await
             .map_err(|e| AppError::Database(e.to_string()))?
             .ok_or_else(|| AppError::NotFound("No exchange rate found".to_string()))

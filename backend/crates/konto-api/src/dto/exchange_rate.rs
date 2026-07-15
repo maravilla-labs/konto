@@ -31,10 +31,17 @@ pub struct UpdateExchangeRateRequest {
     pub source: Option<Option<String>>,
 }
 
+#[derive(Debug, Serialize, ToSchema)]
+pub struct FetchLatestRatesResponse {
+    pub rates_upserted: usize,
+}
+
 #[derive(Debug, Deserialize, IntoParams)]
 pub struct LatestRateQuery {
     pub from_currency_id: String,
     pub to_currency_id: String,
+    /// Optional as-of date (YYYY-MM-DD); defaults to the most recent rate regardless of date.
+    pub as_of_date: Option<String>,
 }
 
 impl From<konto_db::entities::exchange_rate::Model> for ExchangeRateResponse {

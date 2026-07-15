@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProjects, useCreateProject, useContacts } from '@/hooks/useApi';
+import { useProjects, useCreateProject, useContacts, useCurrencies } from '@/hooks/useApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +53,7 @@ export function ProjectsPage() {
   const createProject = useCreateProject();
   const { data: contactsData } = useContacts({ per_page: 200 });
   const contacts = contactsData?.data ?? [];
+  const { data: currencies } = useCurrencies();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -67,13 +68,13 @@ export function ProjectsPage() {
     soft_budget_amount: '',
     hard_budget_amount: '',
     invoicing_method: 'hourly',
-    currency: 'CHF',
+    currency_id: '',
   });
 
   const defaultForm = {
     name: '', number: '', description: '', start_date: '', language: '',
     contact_id: '', hourly_rate: '', soft_budget_hours: '', hard_budget_hours: '',
-    soft_budget_amount: '', hard_budget_amount: '', invoicing_method: 'hourly', currency: 'CHF',
+    soft_budget_amount: '', hard_budget_amount: '', invoicing_method: 'hourly', currency_id: '',
   };
 
   function handleCreate() {
@@ -91,7 +92,7 @@ export function ProjectsPage() {
         soft_budget_amount: form.soft_budget_amount ? Number(form.soft_budget_amount) : undefined,
         hard_budget_amount: form.hard_budget_amount ? Number(form.hard_budget_amount) : undefined,
         invoicing_method: form.invoicing_method || undefined,
-        currency: form.currency || undefined,
+        currency_id: form.currency_id || undefined,
       },
       {
         onSuccess: () => {
@@ -186,7 +187,18 @@ export function ProjectsPage() {
                 </div>
                 <div>
                   <Label>{t('project_conditions.currency', 'Currency')}</Label>
-                  <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="CHF" />
+                  <Select
+                    value={form.currency_id || '__none__'}
+                    onValueChange={(v) => setForm({ ...form, currency_id: v === '__none__' ? '' : v })}
+                  >
+                    <SelectTrigger><SelectValue placeholder={t('common.none', 'None')} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">{t('common.none', 'None')}</SelectItem>
+                      {(currencies ?? []).map((c) => (
+                        <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

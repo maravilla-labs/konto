@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { useExchangeRates, useCreateExchangeRate, useDeleteExchangeRate } from '@/hooks/useApi';
+import {
+  useExchangeRates, useCreateExchangeRate, useDeleteExchangeRate,
+  useCurrencies, useFetchLatestRatesFromEcb,
+} from '@/hooks/useApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,15 +41,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-
-const currencies = ['CHF', 'EUR', 'USD'];
 
 export function ExchangeRatesPage() {
   const { data, isLoading } = useExchangeRates();
+  const { data: currenciesData } = useCurrencies();
   const createRate = useCreateExchangeRate();
   const deleteRate = useDeleteExchangeRate();
+  const fetchFromEcb = useFetchLatestRatesFromEcb();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     from_currency_id: '',
@@ -57,6 +60,15 @@ export function ExchangeRatesPage() {
   });
 
   const rates = data?.data ?? [];
+  const currencies = currenciesData ?? [];
+  const currencyCode = (id: string) => currencies.find((c) => c.id === id)?.code ?? id;
+
+  function handleFetchFromEcb() {
+    fetchFromEcb.mutate(undefined, {
+      onSuccess: (res) => toast.success(`Fetched ${res.data.rates_upserted} rate(s) from the ECB`),
+      onError: () => toast.error('Failed to fetch rates from the ECB'),
+    });
+  }
 
   function handleCreate() {
     createRate.mutate(
@@ -98,7 +110,11 @@ export function ExchangeRatesPage() {
           <h2 className="text-lg font-semibold">Exchange Rates</h2>
           <p className="text-sm text-muted-foreground">Manage currency exchange rates</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={handleFetchFromEcb} disabled={fetchFromEcb.isPending}>
+            <RefreshCw className="mr-1 h-4 w-4" /> Fetch Latest from ECB
+          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm">
               <Plus className="mr-1 h-4 w-4" /> Add Rate
@@ -119,7 +135,7 @@ export function ExchangeRatesPage() {
                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       {currencies.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -133,7 +149,7 @@ export function ExchangeRatesPage() {
                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       {currencies.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -168,7 +184,8 @@ export function ExchangeRatesPage() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -195,10 +212,10 @@ export function ExchangeRatesPage() {
                 {rates.map((rate) => (
                   <TableRow key={rate.id}>
                     <TableCell className="font-mono font-medium">
-                      {rate.from_currency_id}
+                      {currencyCode(rate.from_currency_id)}
                     </TableCell>
                     <TableCell className="font-mono font-medium">
-                      {rate.to_currency_id}
+                      {currencyCode(rate.to_currency_id)}
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">
                       {rate.rate}

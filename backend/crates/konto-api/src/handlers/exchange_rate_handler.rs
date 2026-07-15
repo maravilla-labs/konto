@@ -7,7 +7,7 @@ use konto_core::services::audit_service::AuditService;
 use konto_core::services::exchange_rate_service::ExchangeRateService;
 
 use crate::dto::exchange_rate::{
-    CreateExchangeRateRequest, ExchangeRateResponse, LatestRateQuery,
+    CreateExchangeRateRequest, ExchangeRateResponse, FetchLatestRatesResponse, LatestRateQuery,
     UpdateExchangeRateRequest,
 };
 use crate::state::AppState;
@@ -66,10 +66,18 @@ pub async fn get_latest_rate(
     State(state): State<AppState>,
     Query(query): Query<LatestRateQuery>,
 ) -> Result<Json<ExchangeRateResponse>, AppError> {
+    let as_of_date = query
+        .as_of_date
+        .as_deref()
+        .map(|d| chrono::NaiveDate::parse_from_str(d, "%Y-%m-%d"))
+        .transpose()
+        .map_err(|e| AppError::Validation(format!("Invalid as_of_date: {e}")))?;
+
     let rate = ExchangeRateService::get_latest(
         &state.db,
         &query.from_currency_id,
         &query.to_currency_id,
+        as_of_date,
     )
     .await?;
     Ok(Json(ExchangeRateResponse::from(rate)))
@@ -126,6 +134,30 @@ pub async fn create_exchange_rate(
     .await?;
 
     Ok(Json(ExchangeRateResponse::from(rate)))
+}
+
+#[utoipa::path(
+    post, path = "/api/v1/exchange-rates/fetch-latest",
+    responses((status = 200, body = FetchLatestRatesResponse))
+)]
+pub async fn fetch_latest_rates(
+    State(state): State<AppState>,
+    Extension(claims): Extension<Claims>,
+) -> Result<Json<FetchLatestRatesResponse>, AppError> {
+    let count = konto_core::services::ecb_rate_service::EcbRateService::fetch_latest(&state.db).await?;
+
+    AuditService::log(
+        &state.db,
+        Some(&claims.sub),
+        "fetch_latest",
+        "exchange_rate",
+        None,
+        None,
+        Some(&format!("{{\"source\":\"ECB\",\"rates_upserted\":{count}}}")),
+    )
+    .await?;
+
+    Ok(Json(FetchLatestRatesResponse { rates_upserted: count }))
 }
 
 #[utoipa::path(

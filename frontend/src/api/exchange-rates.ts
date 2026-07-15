@@ -18,4 +18,14 @@ export const exchangeRatesApi = {
   delete(id: string) {
     return client.delete(`/exchange-rates/${id}`);
   },
+
+  getLatest(fromCurrencyId: string, toCurrencyId: string, asOfDate?: string) {
+    return client.get<ExchangeRate>('/exchange-rates/latest', {
+      params: { from_currency_id: fromCurrencyId, to_currency_id: toCurrencyId, as_of_date: asOfDate },
+    });
+  },
+
+  fetchLatestFromEcb() {
+    return client.post<{ rates_upserted: number }>('/exchange-rates/fetch-latest');
+  },
 };

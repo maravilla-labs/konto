@@ -3,6 +3,7 @@ use konto_api::dto::auth::*;
 use konto_api::dto::contact::*;
 use konto_api::dto::document::*;
 use konto_api::dto::exchange_rate::*;
+use konto_api::dto::currency_exchange::*;
 use konto_api::dto::fiscal_year::*;
 use konto_api::dto::import::*;
 use konto_api::dto::journal::*;
@@ -96,10 +97,13 @@ use utoipa::OpenApi;
         fiscal_year_handler::close_fiscal_year,
         exchange_rate_handler::list_exchange_rates,
         exchange_rate_handler::get_latest_rate,
+        exchange_rate_handler::fetch_latest_rates,
         exchange_rate_handler::get_exchange_rate,
         exchange_rate_handler::create_exchange_rate,
         exchange_rate_handler::update_exchange_rate,
         exchange_rate_handler::delete_exchange_rate,
+        currency_exchange_handler::list_currency_exchanges,
+        currency_exchange_handler::record_transfer,
         report_handler::trial_balance,
         report_handler::balance_sheet,
         report_handler::profit_loss,
@@ -261,7 +265,8 @@ use utoipa::OpenApi;
             FiscalYearResponse, FiscalPeriodResponse, FiscalYearDetailResponse,
             CreateFiscalYearRequest, UpdateFiscalYearRequest,
             ExchangeRateResponse, CreateExchangeRateRequest,
-            UpdateExchangeRateRequest,
+            UpdateExchangeRateRequest, FetchLatestRatesResponse,
+            CurrencyExchangeResponse, RecordTransferRequest,
             TrialBalanceRowResponse, BalanceSheetResponse, ProfitLossResponse,
             LedgerLineResponse, VatReportEntryResponse, VatReportResponse,
             DashboardStatsResponse, RecentEntryResponse,

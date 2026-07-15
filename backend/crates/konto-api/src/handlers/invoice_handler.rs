@@ -237,7 +237,7 @@ pub async fn pay_invoice(
     let payment_date = parse_date(&body.payment_date)?;
 
     let inv = InvoiceService::mark_paid(
-        &state.db, &id, payment_date, &body.payment_account_id, &claims.sub,
+        &state.db, &id, payment_date, &body.bank_account_id, body.actual_base_amount, &claims.sub,
     )
     .await?;
 
@@ -580,7 +580,7 @@ pub async fn record_payment(
 
     let payment = InvoiceService::record_payment(
         &state.db, &id, body.amount, payment_date,
-        &body.payment_account_id, body.payment_method, body.reference, &claims.sub,
+        &body.bank_account_id, body.actual_base_amount, body.payment_method, body.reference, &claims.sub,
     ).await?;
 
     let resp = crate::dto::invoice_payment::InvoicePaymentResponse::from(payment.clone());

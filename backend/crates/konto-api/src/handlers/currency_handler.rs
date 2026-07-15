@@ -62,7 +62,9 @@ pub async fn update_currency(
     Path(id): Path<String>,
     Json(body): Json<UpdateCurrencyRequest>,
 ) -> Result<Json<CurrencyResponse>, AppError> {
-    let cur = CurrencyService::update(&state.db, &id, &body.code, &body.name, &body.symbol).await?;
+    let cur = CurrencyService::update(
+        &state.db, &id, &body.code, &body.name, &body.symbol, body.default_bank_account_id,
+    ).await?;
 
     let resp = CurrencyResponse::from(cur);
     let new_vals = serde_json::to_string(&resp).ok();

@@ -49,3 +49,4 @@ pub mod payroll_run_repo;
 pub mod payroll_run_line_repo;
 pub mod payout_entry_repo;
 pub mod project_sub_status_repo;
+pub mod currency_exchange_repo;

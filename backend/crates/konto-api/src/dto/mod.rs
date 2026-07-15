@@ -47,3 +47,4 @@ pub mod payout_entry;
 pub mod project_budget;
 pub mod project_sub_status;
 pub mod setup;
+pub mod currency_exchange;

@@ -35,6 +35,7 @@ export function InvoiceEditPage() {
     default_vat_rate_id: '',
     default_account_id: '',
     bank_account_id: '',
+    currency_id: '',
     lines: [{ _key: crypto.randomUUID(), description: '', quantity: '1', unit_price: '', vat_rate_id: '', account_id: '', discount_percent: '' }],
   });
 
@@ -58,6 +59,7 @@ export function InvoiceEditPage() {
         footer_text: data.footer_text ?? '',
         contact_person_id: data.contact_person_id ?? '',
         bank_account_id: data.bank_account_id ?? '',
+        currency_id: data.currency_id ?? '',
         default_vat_rate_id: allSameVat ? lineVatIds[0]! : '',
         default_account_id: allSameAccount ? lineAccountIds[0]! : '',
         lines: data.lines.map((l): LineFormData => ({
@@ -101,6 +103,7 @@ export function InvoiceEditPage() {
           issue_date: form.issue_date,
           due_date: form.due_date,
           language: form.language || undefined,
+          currency_id: form.currency_id || undefined,
           notes: form.notes || undefined,
           payment_terms: form.payment_terms || undefined,
           header_text: form.header_text || undefined,

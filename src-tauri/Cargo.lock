@@ -3477,7 +3477,7 @@ dependencies = [
 
 [[package]]
 name = "konto-api"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "axum",
  "axum-extra",
@@ -3500,7 +3500,7 @@ dependencies = [
 
 [[package]]
 name = "konto-common"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "axum",
  "chrono",
@@ -3515,7 +3515,7 @@ dependencies = [
 
 [[package]]
 name = "konto-core"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "anyhow",
  "argon2",
@@ -3551,7 +3551,7 @@ dependencies = [
 
 [[package]]
 name = "konto-crypto"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -3568,7 +3568,7 @@ dependencies = [
 
 [[package]]
 name = "konto-db"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "chrono",
  "konto-common",
@@ -3586,7 +3586,7 @@ dependencies = [
 
 [[package]]
 name = "konto-migration"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "argon2",
  "chrono",
@@ -3598,7 +3598,7 @@ dependencies = [
 
 [[package]]
 name = "konto-server"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "axum",
  "dotenvy",
@@ -3900,7 +3900,7 @@ dependencies = [
 
 [[package]]
 name = "maravilla-konto"
-version = "0.1.0-beta.7"
+version = "0.1.0-beta.8"
 dependencies = [
  "konto-api",
  "konto-common",

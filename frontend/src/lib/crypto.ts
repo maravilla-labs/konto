@@ -14,6 +14,12 @@ export interface CryptoStatus {
   mode: CryptoMode;
   unlocked: boolean;
   port: number;
+  /**
+   * Set when the desktop app failed to start (most often a failed database
+   * migration). The boot gate shows this instead of letting the user into a
+   * session with no backend behind it.
+   */
+  bootError: string | null;
 }
 
 async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {

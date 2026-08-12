@@ -15,6 +15,13 @@ impl MigrationTrait for Migration {
         db.execute_unprepared("UPDATE accounts SET account_type = 'revenue' WHERE number = 6999")
             .await?;
 
+        // SQLite keeps whatever an aborted migration already wrote, so clear any
+        // rows a previous partial run left behind before re-seeding.
+        db.execute_unprepared(
+            "DELETE FROM default_accounts WHERE setting_key IN ('fx_gain_account', 'fx_loss_account')",
+        )
+        .await?;
+
         let defaults = vec![
             ("fx_gain_account", "6999", "Währungsgewinne (Realized FX Gain)"),
             ("fx_loss_account", "6949", "Währungsverluste (Realized FX Loss)"),

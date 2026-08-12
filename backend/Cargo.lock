@@ -2435,7 +2435,10 @@ dependencies = [
  "argon2",
  "chrono",
  "rand_core 0.6.4",
+ "sea-orm",
  "sea-orm-migration",
+ "tokio",
+ "tracing",
  "uuid",
 ]
 

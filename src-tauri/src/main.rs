@@ -62,26 +62,44 @@ fn main() {
             crypto_disable_password
         ])
         .setup(move |app| {
-            let app_data_dir = app
-                .path()
-                .app_data_dir()
-                .expect("Failed to get app data directory");
+            // NOTE: nothing in here may panic. macOS runs `setup` from
+            // `applicationDidFinishLaunching`, an Objective-C callback a Rust
+            // panic cannot unwind out of, so a panic aborts the process on the
+            // spot — no window, no message, just a crash report. Boot failures
+            // are recorded instead and rendered by the frontend.
+            let app_data_dir = match app.path().app_data_dir() {
+                Ok(dir) => Some(dir),
+                Err(e) => {
+                    let msg = format!("Failed to get app data directory: {e}");
+                    tracing::error!("{msg}");
+                    server::set_boot_error(msg);
+                    None
+                }
+            };
 
             // Resolve the encryption key and (unless locked behind a master
             // password) start the embedded Axum server.
-            match server::init(rt, app_data_dir.clone()) {
-                server::InitOutcome::Ready(port) => {
-                    set_server_port(port);
-                    tracing::info!("Maravilla Konto started, server on port {port}");
-                }
-                server::InitOutcome::Locked => {
-                    tracing::info!("Awaiting master password; server not yet started");
+            if let Some(dir) = app_data_dir.as_ref() {
+                match server::init(rt, dir.clone()) {
+                    Ok(server::InitOutcome::Ready(port)) => {
+                        set_server_port(port);
+                        tracing::info!("Maravilla Konto started, server on port {port}");
+                    }
+                    Ok(server::InitOutcome::Locked) => {
+                        tracing::info!("Awaiting master password; server not yet started");
+                    }
+                    Err(e) => {
+                        tracing::error!("Startup failed: {e}");
+                        server::set_boot_error(e);
+                    }
                 }
             }
 
             // Forward --experimental CLI flag to the frontend via localStorage
             let experimental = std::env::args().any(|a| a == "--experimental");
 
+            // The window is created regardless of the outcome above: it is what
+            // shows the user the error when startup failed.
             if let Some(window) = app.get_webview_window("main") {
                 if experimental {
                     let _ = window.eval("localStorage.setItem('konto_experimental','true')");
@@ -89,10 +107,12 @@ fn main() {
 
                 // On first launch, size window relative to monitor.
                 // On subsequent launches, tauri_plugin_window_state restores saved size.
-                let marker = app_data_dir.join(".window-initialized");
-                if !marker.exists() {
-                    resize_to_monitor(&window);
-                    std::fs::write(&marker, "").ok();
+                if let Some(dir) = app_data_dir.as_ref() {
+                    let marker = dir.join(".window-initialized");
+                    if !marker.exists() {
+                        resize_to_monitor(&window);
+                        std::fs::write(&marker, "").ok();
+                    }
                 }
 
                 apply_vibrancy(&window);

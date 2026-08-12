@@ -9,6 +9,11 @@ uuid = { workspace = true }
 argon2 = { workspace = true }
 chrono = { workspace = true }
 rand_core = { version = "0.6", features = ["getrandom"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+sea-orm = { workspace = true }
+tokio = { workspace = true }
 
 [lints]
 workspace = true

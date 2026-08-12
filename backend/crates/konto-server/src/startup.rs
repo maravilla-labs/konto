@@ -80,15 +80,17 @@ pub async fn connect_database(config: &AppConfig) -> DatabaseConnection {
 /// Build the application state from an established DB connection: run
 /// migrations and init JWT. The caller establishes the connection (encrypted or
 /// not) so it controls key resolution; see [`connect_database`].
-#[allow(clippy::expect_used)]
+///
+/// Returns the migration error rather than panicking: in the desktop app this
+/// runs inside Tauri's `setup`, which is called from an Objective-C callback, so
+/// a panic here cannot unwind and aborts the process before anything can be
+/// shown to the user.
 pub async fn build_state(
     config: &AppConfig,
     storage: Arc<dyn StorageService>,
     db: DatabaseConnection,
-) -> AppState {
-    Migrator::up(&db, None)
-        .await
-        .expect("Failed to run migrations");
+) -> Result<AppState, sea_orm::DbErr> {
+    Migrator::up(&db, None).await?;
 
     tracing::info!("Migrations completed successfully");
 
@@ -103,14 +105,14 @@ pub async fn build_state(
     const SETUP_MAX_REQUESTS: usize = 3;
     const SETUP_WINDOW_SECS: u64 = 60;
 
-    AppState {
+    Ok(AppState {
         db,
         jwt,
         config: Arc::new(config.clone()),
         storage,
         login_limiter: RateLimiter::new(LOGIN_MAX_REQUESTS, LOGIN_WINDOW_SECS),
         setup_limiter: RateLimiter::new(SETUP_MAX_REQUESTS, SETUP_WINDOW_SECS),
-    }
+    })
 }
 
 /// Build the Axum router with CORS, tracing, and Swagger UI.
@@ -256,7 +258,9 @@ pub async fn run_standalone() {
     );
 
     let db = connect_database(&config).await;
-    let state = build_state(&config, storage, db).await;
+    let state = build_state(&config, storage, db)
+        .await
+        .expect("Failed to run migrations");
     spawn_schedulers(&state.db);
 
     let app = build_app(state, &config.cors_origin);

@@ -3592,6 +3592,7 @@ dependencies = [
  "chrono",
  "rand_core 0.6.4",
  "sea-orm-migration",
+ "tracing",
  "uuid",
 ]
 

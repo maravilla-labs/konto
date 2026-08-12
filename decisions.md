@@ -359,3 +359,26 @@
 - **Decision**: On first encrypted launch, an existing plaintext `maravilla.db` is detected by its `SQLite format 3\0` header and converted in place via SQLCipher `sqlcipher_export` into a temp file that is **verified to open under the key before** atomically replacing the original. No plaintext backup is retained and stale plaintext `-wal`/`-shm` sidecars are deleted. Existing plaintext uploads are re-encrypted by an idempotent directory walk (already-encrypted files authenticate and are skipped); on download, content that fails authentication is treated as legacy plaintext and returned as-is.
 - **Rationale**: Beta users already have plaintext databases/files; the upgrade must be seamless and must not leave a plaintext copy on disk (which would defeat the feature). Verify-before-replace prevents data loss if export fails.
 - **Status**: Active
+
+### TD-066: Migrations Must Be Re-runnable; Boot Must Never Panic
+
+- **Decision**: Two rules, both forced by the v0.1.0-beta.7 boot crash.
+  (1) Every migration is written to tolerate re-running over its own partial
+  output — guard `ADD COLUMN`/`DROP COLUMN` with `has_column`, clear seed rows
+  before re-inserting, and never abort a migration over unmappable *data* when
+  the column is nullable (log and leave it unset instead).
+  (2) Nothing inside Tauri's `setup()` may panic. `server::init`,
+  `start_with_dek` and `startup::build_state` all return `Result`; failures are
+  recorded in a `BOOT_ERROR` cell, surfaced through `crypto_status().bootError`,
+  and rendered by `UnlockGate` as an error screen.
+- **Rationale**: SQLite commits DDL statement by statement and sea-orm only
+  records a migration once `up` returns `Ok`, so a migration that fails partway
+  leaves its finished statements behind and is retried from the top forever. In
+  beta.7, `m20240101_000089` added `projects.currency_id`, then aborted on a
+  project whose free-text currency was `€`; every later launch died on
+  `duplicate column name: currency_id`. Because `setup()` runs from
+  `applicationDidFinishLaunching`, the panic could not unwind across the
+  Objective-C frame and aborted the process — no window, no message, only a
+  crash report. A user whose app cannot boot also cannot fix the data the
+  migration is complaining about, so a data-quality problem must never be fatal.
+- **Status**: Active (regression tests in `konto-migration/tests/migrations.rs`)
